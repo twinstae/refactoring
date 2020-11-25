@@ -26,8 +26,12 @@ invoices = {
 def statement(invoice):
     data = {
         "customer": invoice["customer"],
-        "performance": invoice["performances"]
+        "performances": invoice["performances"].copy()
     }
+
+    for perf in data['performances']:
+        perf['play'] = play_data[perf["playID"]]
+
     return render_plain_text(data)
 
 
@@ -46,15 +50,12 @@ def render_plain_text(data):
 
     def volume_credit_for(perf):
         result = max(perf["audience"] - 30, 0)
-        if "comedy" == play_for(perf)['type']:
+        if "comedy" == perf['play']['type']:
             result += perf['audience'] // 5
         return result
 
-    def play_for(perf):
-        return play_data[perf["playID"]]
-
     def amount_for(perf):
-        play = play_for(perf)
+        play = perf['play'](perf)
         result = 0
         if play['type'] == "tragedy":
             result = 40000
@@ -68,7 +69,7 @@ def render_plain_text(data):
 
     result = '청구내역 (고객명 : %s)\n' % (data["customer"])
     for perf in data['performance']:
-        result += '    %s: %s (%s석)\n' % (play_for(perf)['name'], amount_for(perf) / 100, perf['audience'])
+        result += '    %s: %s (%s석)\n' % (perf['play'](perf)['name'], amount_for(perf) / 100, perf['audience'])
     result += "총액: %s\n" % (total_amount() / 100)
     result += "적립 포인트: %s 점" % total_volume_credits()
 
