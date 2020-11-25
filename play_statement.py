@@ -24,6 +24,10 @@ invoices = {
 
 
 def statement(invoice):
+    data = make_data(invoice)
+    return render_plain_text(data)
+
+def make_data(invoice):
     def amount_for(perf):
         play = perf['play']
         result = 0
@@ -61,9 +65,7 @@ def statement(invoice):
 
     data["total_amount"] = total_amount()
     data["total_volume_credits"] = total_volume_credits()
-
-    return render_plain_text(data)
-
+    return data
 
 def render_plain_text(data):
     result = '청구내역 (고객명 : %s)\n' % (data["customer"])
@@ -71,7 +73,6 @@ def render_plain_text(data):
         result += '    %s: %s (%s석)\n' % (perf['play']['name'], perf['amount'] / 100, perf['audience'])
     result += "총액: %s\n" % (data['total_amount'] / 100)
     result += "적립 포인트: %s 점" % data['total_volume_credits']
-
     return result
 
 
