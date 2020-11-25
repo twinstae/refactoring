@@ -30,20 +30,22 @@ def statement(invoice):
 
     for perf in invoice["performances"]:
         play = play_for(perf)
-        this_amount = amount_for(perf)
+        volume_credits += volume_credit_for(perf)
 
-        volume_credits += max(perf["audience"] - 30, 0)
-
-        if "comedy" == play['type']:
-            volume_credits += perf['audience'] // 5
-
-        result += '    %s: %s (%s석)\n' % (play['name'], this_amount / 100, perf['audience'])
-        total_amount += this_amount
+        result += '    %s: %s (%s석)\n' % (play['name'], amount_for(perf) / 100, perf['audience'])
+        total_amount += amount_for(perf)
 
     result += "총액: %s\n" % (total_amount / 100)
     result += "적립 포인트: %s 점" % volume_credits
 
     return result
+
+
+def volume_credit_for(perf):
+    volume_credits = max(perf["audience"] - 30, 0)
+    if "comedy" == play_for(perf)['type']:
+        volume_credits += perf['audience'] // 5
+    return volume_credits
 
 
 def play_for(perf):
