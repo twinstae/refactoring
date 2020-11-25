@@ -54,11 +54,15 @@ answer = """청구내역 (고객명 : BigCo)
 
 passed = True
 
+count = 0
 for a, r in zip(answer.split("\n"), statement(invoices).split("\n")):
+    count += 1
     if a != r:
         print("test 실패...")
         print(a)
         print(r)
         passed = False
+    else:
+        print("테스트", count, "PASS")
 if passed:
-    print("테스트 통과")
+    print("!!!초록 막대!!!")
