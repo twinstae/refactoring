@@ -9,11 +9,11 @@ class PerfCalculator:
     def __init__(self, a_perf):
         self.perf = a_perf
 
-    def amount(self):            
+    def amount(self):
         raise Exception
-
+    
     def volume_credit(self):
-        raise Exception
+        return max(self.perf["audience"] - 30, 0)
 
 
 class TragedyCalculator(PerfCalculator):
@@ -21,10 +21,6 @@ class TragedyCalculator(PerfCalculator):
         result = 40000
         if self.perf["audience"] > 30:
             result += 1000 * (self.perf["audience"] - 30)
-        return result
-
-    def volume_credit(self):
-        result = max(self.perf["audience"] - 30, 0)
         return result
 
 
@@ -36,9 +32,7 @@ class ComedyCalculator(PerfCalculator):
         return result
 
     def volume_credit(self):
-        result = max(self.perf["audience"] - 30, 0)
-        result += self.perf['audience'] // 5
-        return result
+        return super().volume_credit() + self.perf['audience'] // 5
 
 
 def play_for(perf):
