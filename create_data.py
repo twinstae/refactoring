@@ -6,26 +6,14 @@ play_data = {
 
 
 class PerfCalculator:
-    def __init__(self, a_perf, a_play):
+    def __init__(self, a_perf):
         self.perf = a_perf
-        self.play = a_play
 
-    def amount(self):
-        result = 0
-        if self.play['type'] == "tragedy":
-            print("error!!!!")
-            raise Exception
-        elif self.play['type'] == "comedy":
-            result = 30000
-            if self.perf["audience"] > 20:
-                result += 10000 + 500 * (self.perf["audience"] - 20)
-        return result
+    def amount(self):            
+        raise Exception
 
     def volume_credit(self):
-        result = max(self.perf["audience"] - 30, 0)
-        if "comedy" == self.perf['play']['type']:
-            result += self.perf['audience'] // 5
-        return result
+        raise Exception
 
 
 class TragedyCalculator(PerfCalculator):
@@ -35,6 +23,23 @@ class TragedyCalculator(PerfCalculator):
             result += 1000 * (self.perf["audience"] - 30)
         return result
 
+    def volume_credit(self):
+        result = max(self.perf["audience"] - 30, 0)
+        return result
+
+
+class ComedyCalculator(PerfCalculator):
+    def amount(self):
+        result = 30000
+        if self.perf["audience"] > 20:
+            result += 10000 + 500 * (self.perf["audience"] - 20)
+        return result
+
+    def volume_credit(self):
+        result = max(self.perf["audience"] - 30, 0)
+        result += self.perf['audience'] // 5
+        return result
+
 
 def play_for(perf):
     return play_data[perf["playID"]]
@@ -42,8 +47,10 @@ def play_for(perf):
 
 def create_calc(perf):
     if play_for(perf)['type'] == 'tragedy':
-        return TragedyCalculator(perf, play_for(perf))
-    return PerfCalculator(perf, play_for(perf))
+        return TragedyCalculator(perf)
+    if play_for(perf)['type'] == 'comedy':
+        return ComedyCalculator(perf)
+    raise Exception
 
 
 def create_data(invoice):
