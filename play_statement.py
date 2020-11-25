@@ -25,21 +25,22 @@ invoices = {
 
 def statement(invoice):
     total_amount = 0
-    volume_credits = 0
     result = '청구내역 (고객명 : %s)\n' % (invoice["customer"])
-
     for perf in invoice["performances"]:
         play = play_for(perf)
         result += '    %s: %s (%s석)\n' % (play['name'], amount_for(perf) / 100, perf['audience'])
         total_amount += amount_for(perf)
-
-    for perf in invoice["performances"]:
-        volume_credits += volume_credit_for(perf)
-
     result += "총액: %s\n" % (total_amount / 100)
-    result += "적립 포인트: %s 점" % volume_credits
+    result += "적립 포인트: %s 점" % total_volume_credits(invoice)
 
     return result
+
+
+def total_volume_credits(invoice):
+    volume_credits = 0
+    for perf in invoice["performances"]:
+        volume_credits += volume_credit_for(perf)
+    return volume_credits
 
 
 def volume_credit_for(perf):
