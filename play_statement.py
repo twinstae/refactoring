@@ -37,19 +37,12 @@ def statement(invoice):
                 result += 10000 + 500 * (perf["audience"] - 20)
         return result
 
-    data = {
-        "customer": invoice["customer"],
-        "performances": invoice["performances"].copy()
-    }
+    def volume_credit_for(perf):
+        result = max(perf["audience"] - 30, 0)
+        if "comedy" == perf['play']['type']:
+            result += perf['audience'] // 5
+        return result
 
-    for perf in data['performances']:
-        perf['play'] = play_data[perf["playID"]]
-        perf['amount'] = amount_for(perf)
-
-    return render_plain_text(data)
-
-
-def render_plain_text(data):
     def total_amount():
         result = 0
         for perf in data["performances"]:
@@ -59,20 +52,31 @@ def render_plain_text(data):
     def total_volume_credits():
         volume_credits = 0
         for perf in data["performances"]:
-            volume_credits += volume_credit_for(perf)
+            volume_credits += perf['credit']
         return volume_credits
 
-    def volume_credit_for(perf):
-        result = max(perf["audience"] - 30, 0)
-        if "comedy" == perf['play']['type']:
-            result += perf['audience'] // 5
-        return result
+    data = {
+        "customer": invoice["customer"],
+        "performances": invoice["performances"].copy()
+    }
 
+    for perf in data['performances']:
+        perf['play'] = play_data[perf["playID"]]
+        perf['amount'] = amount_for(perf)
+        perf['credit'] = volume_credit_for(perf)
+
+    data["total_amount"] = total_amount()
+    data["total_volume_credits"] = total_volume_credits()
+
+    return render_plain_text(data)
+
+
+def render_plain_text(data):
     result = '청구내역 (고객명 : %s)\n' % (data["customer"])
     for perf in data['performances']:
         result += '    %s: %s (%s석)\n' % (perf['play']['name'], perf['amount'] / 100, perf['audience'])
-    result += "총액: %s\n" % (total_amount() / 100)
-    result += "적립 포인트: %s 점" % total_volume_credits()
+    result += "총액: %s\n" % (data['total_amount'] / 100)
+    result += "적립 포인트: %s 점" % data['total_volume_credits']
 
     return result
 
