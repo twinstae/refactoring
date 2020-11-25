@@ -24,55 +24,54 @@ invoices = {
 
 
 def statement(invoice):
+    data = {
+        "customer": invoice["customer"],
+        "performance": invoice["performances"]
+    }
+    return render_plain_text(data)
 
-    result = '청구내역 (고객명 : %s)\n' % (invoice["customer"])
 
-    for perf in invoice["performances"]:
+def render_plain_text(data):
+    def total_amount():
+        result = 0
+        for perf in data["performance"]:
+            result += amount_for(perf)
+        return result
+
+    def total_volume_credits():
+        volume_credits = 0
+        for perf in data["performance"]:
+            volume_credits += volume_credit_for(perf)
+        return volume_credits
+
+    def volume_credit_for(perf):
+        result = max(perf["audience"] - 30, 0)
+        if "comedy" == play_for(perf)['type']:
+            result += perf['audience'] // 5
+        return result
+
+    def play_for(perf):
+        return play_data[perf["playID"]]
+
+    def amount_for(perf):
         play = play_for(perf)
-        result += '    %s: %s (%s석)\n' % (play['name'], amount_for(perf) / 100, perf['audience'])
+        result = 0
+        if play['type'] == "tragedy":
+            result = 40000
+            if perf["audience"] > 30:
+                result += 1000 * (perf["audience"] - 30)
+        elif play['type'] == "comedy":
+            result = 30000
+            if perf["audience"] > 20:
+                result += 10000 + 500 * (perf["audience"] - 20)
+        return result
 
-    result += "총액: %s\n" % (total_amount(invoice) / 100)
-    result += "적립 포인트: %s 점" % total_volume_credits(invoice)
+    result = '청구내역 (고객명 : %s)\n' % (data["customer"])
+    for perf in data['performance']:
+        result += '    %s: %s (%s석)\n' % (play_for(perf)['name'], amount_for(perf) / 100, perf['audience'])
+    result += "총액: %s\n" % (total_amount() / 100)
+    result += "적립 포인트: %s 점" % total_volume_credits()
 
-    return result
-
-
-def total_amount(invoice):
-    result = 0
-    for perf in invoice["performances"]:
-        result += amount_for(perf)
-    return result
-
-
-def total_volume_credits(invoice):
-    volume_credits = 0
-    for perf in invoice["performances"]:
-        volume_credits += volume_credit_for(perf)
-    return volume_credits
-
-
-def volume_credit_for(perf):
-    result = max(perf["audience"] - 30, 0)
-    if "comedy" == play_for(perf)['type']:
-        result += perf['audience'] // 5
-    return result
-
-
-def play_for(perf):
-    return play_data[perf["playID"]]
-
-
-def amount_for(perf):
-    play = play_for(perf)
-    result = 0
-    if play['type'] == "tragedy":
-        result = 40000
-        if perf["audience"] > 30:
-            result += 1000 * (perf["audience"] - 30)
-    elif play['type'] == "comedy":
-        result = 30000
-        if perf["audience"] > 20:
-            result += 10000 + 500 * (perf["audience"] - 20)
     return result
 
 
