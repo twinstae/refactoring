@@ -4,26 +4,37 @@ play_data = {
     "othello": {"name": "Othello", "type": "tragedy"}
 }
 
-def create_data(invoice):
-    def amount_for(perf):
-        play = perf['play']
+
+class PerfCalculator:
+    def __init__(self, a_perf, a_play):
+        self.perf = a_perf
+        self.play = a_play
+
+    def amount_for(self):
+        play = self.perf['play']
         result = 0
         if play['type'] == "tragedy":
             result = 40000
-            if perf["audience"] > 30:
-                result += 1000 * (perf["audience"] - 30)
+            if self.perf["audience"] > 30:
+                result += 1000 * (self.perf["audience"] - 30)
         elif play['type'] == "comedy":
             result = 30000
-            if perf["audience"] > 20:
-                result += 10000 + 500 * (perf["audience"] - 20)
+            if self.perf["audience"] > 20:
+                result += 10000 + 500 * (self.perf["audience"] - 20)
         return result
 
-    def volume_credit_for(perf):
-        result = max(perf["audience"] - 30, 0)
-        if "comedy" == perf['play']['type']:
-            result += perf['audience'] // 5
+    def volume_credit_for(self):
+        result = max(self.perf["audience"] - 30, 0)
+        if "comedy" == self.perf['play']['type']:
+            result += self.perf['audience'] // 5
         return result
 
+
+def play_for(perf):
+    return play_data[perf["playID"]]
+
+
+def create_data(invoice):
     def total_amount():
         return sum([p['amount'] for p in data['performances']])
 
@@ -35,10 +46,11 @@ def create_data(invoice):
         "performances": invoice["performances"].copy()
     }
 
-    for perf in data['performances']:
-        perf['play'] = play_data[perf["playID"]]
-        perf['amount'] = amount_for(perf)
-        perf['credit'] = volume_credit_for(perf)
+    for perf in data['performances']:  # enrich perf
+        calc = PerfCalculator(perf, play_for(perf))
+        perf['play'] = play_for(perf)
+        perf['amount'] = calc.amount_for()
+        perf['credit'] = calc.volume_credit_for()
 
     data["total_amount"] = total_amount()
     data["total_volume_credits"] = total_volume_credits()
