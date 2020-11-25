@@ -44,10 +44,10 @@ def statement(invoice):
         return result
 
     def total_amount():
-        return sum(map(lambda p: p['amount'], data['performances']))
+        return sum([p['amount'] for p in data['performances']])
 
     def total_volume_credits():
-        return sum(map(lambda p: p['credit'], data['performances']))
+        return sum([p['credit'] for p in data['performances']])
 
     data = {
         "customer": invoice["customer"],
