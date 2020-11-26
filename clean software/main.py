@@ -27,8 +27,10 @@ class PrimeCalculator:
             self.is_crossed[j] = True
 
     def put_uncrossed_int_to_result(self):
-        return [i for i, is_prime in enumerate(self.is_crossed[2:], start=2) if not is_prime]
-    
+        return [i for i, is_prime
+                in enumerate(self.is_crossed[2:], start=2)
+                if not is_prime]
+
 
 if __name__ == '__main__':
     calc = PrimeCalculator()
