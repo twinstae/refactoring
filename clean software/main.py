@@ -1,15 +1,18 @@
 def generate_primes(max_value):
     if max_value >= 2:
         f = init(max_value)  # 파이써닉한 꼼수
-
-        for i in range(2, int(len(f) ** 0.5)):
-            if f[i]:
-                for j in range(2 * i, len(f), i):
-                    f[j] = False
-
+        f = find_prime(f)
         primes = extract_prime(f)
         return primes
     return []
+
+
+def find_prime(f):
+    for i in range(2, int(len(f) ** 0.5)):
+        if f[i]:
+            for j in range(2 * i, len(f), i):
+                f[j] = False
+    return f
 
 
 def init(max_value):
