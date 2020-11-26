@@ -1,26 +1,30 @@
 class PrimeCalculator:
-    f = []
+    is_crossed = []
 
-    def init_f(self, max_value):
-        self.f = [True] * (max_value + 1)
+    def init_is_crossed(self, max_value):
+        self.is_crossed = [False] * (max_value + 1)
 
     def generate_primes(self, max_value):
         if max_value + 1 > 2:
-            self.init_f(max_value)
-            self.find_prime()
-            return self.extract_prime()
+            self.init_is_crossed(max_value)
+            return self.find_prime()
         return []
 
-    def find_prime(self):
-        self.f[0] = False
-        self.f[1] = False
-        for i in range(2, int(len(self.f) ** 0.5)):
-            if self.f[i]:
-                for j in range(2 * i, len(self.f), i):
-                    self.f[j] = False
+    def not_crossed(self, i):
+        return not self.is_crossed[i]
 
-    def extract_prime(self):
-        return [i for i, is_prime in enumerate(self.f) if is_prime]
+    def find_prime(self):
+        for i in range(2, self.max_factor()):
+            if self.not_crossed(i):
+                self.cross_out_multiple_of(i)
+        return [i for i, is_prime in enumerate(self.is_crossed[2:], start=2) if not is_prime]
+
+    def cross_out_multiple_of(self, i):
+        for j in range(2 * i, len(self.is_crossed), i):
+            self.is_crossed[j] = True
+
+    def max_factor(self):
+        return int(len(self.is_crossed) ** 0.5 + 1)
 
 
 if __name__ == '__main__':
