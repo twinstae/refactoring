@@ -8,11 +8,18 @@ class Employee:
 class PaymentClassification:
     pass
 
+
 class HourlyClassification(PaymentClassification):
-    pass
+    def __init__(self, hourly_rate):
+        self.hourly_rate = hourly_rate
+
 
 class CommissionedClassification(PaymentClassification):
-    pass
+    def __init__(self, salary, commission_rate):
+        self.hourly_rate = salary
+        self.commission_rate = commission_rate
+
 
 class SalariedClassification(PaymentClassification):
-    pass
+    def __init__(self, salary):
+        self.hourly_rate = salary

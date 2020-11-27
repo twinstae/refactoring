@@ -45,9 +45,8 @@ class AddHourlyEmployee(AddEmployeeTransaction):
         e.hourly_rate = self.args['hourly_rate']
         DB.add_employee(DB, self.args['emp_id'], e)
 
-    @staticmethod
-    def get_classification():
-        return HourlyClassification()
+    def get_classification(self):
+        return HourlyClassification(self.args['hourly_rate'])
 
     @staticmethod
     def get_schedule():
@@ -60,12 +59,10 @@ class AddSalariedEmployee(AddEmployeeTransaction):
         e.salary = self.args['salary']
         DB.add_employee(DB, self.args['emp_id'], e)
 
-    @staticmethod
-    def get_classification():
-        return SalariedClassification()
+    def get_classification(self):
+        return SalariedClassification(self.args['salary'])
 
-    @staticmethod
-    def get_schedule():
+    def get_schedule(self):
         return MonthlySchedule()
 
 
@@ -76,10 +73,11 @@ class AddCommissionedEmployee(AddEmployeeTransaction):
         e.commission_rate = self.args['commission_rate']
         DB.add_employee(DB, self.args['emp_id'], e)
 
-    @staticmethod
-    def get_classification():
-        return CommissionedClassification()
+    def get_classification(self):
+        return CommissionedClassification(
+            salary=self.args['salary'],
+            commission_rate=self.args['commission_rate']
+        )
 
-    @staticmethod
-    def get_schedule():
+    def get_schedule(self):
         return BiweeklySchedule()

@@ -58,13 +58,12 @@ class TestAddEmployee(unittest.TestCase):
             method=HoldMethod
         )
 
-    @staticmethod
-    def new_employee(arg_dict, add_employee):
+    def new_employee(self, arg_dict, add_employee):
         t = add_employee(arg_dict)
         t.execute()
         employee = DB.get_employee(DB, arg_dict['emp_id'])
-        for attr_name in arg_dict.keys():
-            getattr(employee, attr_name)
+        for attr_name, attr_value in arg_dict.items():
+            self.assertTrue(getattr(employee, attr_name) == attr_value)
         return employee
 
     def classification_schedule_method(self, employee, classification, schedule, method):
