@@ -1,8 +1,11 @@
 class Employee:
-    def __init__(self,emp_id, name, address):
+    def __init__(self, emp_id, name, address, classification, schedule, method):
         self.emp_id = emp_id
         self.name = name
         self.address = address
+        self.classification = classification
+        self.schedule = schedule
+        self.method = method
 
 
 class PaymentClassification:
@@ -23,7 +26,7 @@ class HourlyClassification(PaymentClassification):
 
 class CommissionedClassification(PaymentClassification):
     def __init__(self, salary, commission_rate):
-        self.hourly_rate = salary
+        self.salary = salary
         self.commission_rate = commission_rate
         self._sales_dict = {}
 
@@ -36,5 +39,5 @@ class CommissionedClassification(PaymentClassification):
 
 class SalariedClassification(PaymentClassification):
     def __init__(self, salary):
-        self.hourly_rate = salary
+        self.salary = salary
 

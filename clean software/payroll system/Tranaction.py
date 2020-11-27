@@ -24,12 +24,14 @@ class AddEmployeeTransaction(Transaction):
         pass
 
     def get_employee(self):
-        e = Employee(emp_id=self.args['emp_id'],
-                     name=self.args['name'],
-                     address=self.args['address'])
-        e.classification = self.get_classification()
-        e.schedule = self.get_schedule()
-        e.method = HoldMethod()
+        e = Employee(
+            emp_id=self.args['emp_id'],
+            name=self.args['name'],
+            address=self.args['address'],
+            classification=self.get_classification(),
+            schedule=self.get_schedule(),
+            method=HoldMethod()
+        )
         return e
 
     @staticmethod
