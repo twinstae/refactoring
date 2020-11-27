@@ -12,6 +12,13 @@ class PaymentClassification:
 class HourlyClassification(PaymentClassification):
     def __init__(self, hourly_rate):
         self.hourly_rate = hourly_rate
+        self._time_card_dict = {}
+
+    def get_time_card(self, date):
+        return self._time_card_dict.get(date, None)
+
+    def add_time_card(self, time_card):
+        self._time_card_dict[time_card.date] = time_card
 
 
 class CommissionedClassification(PaymentClassification):

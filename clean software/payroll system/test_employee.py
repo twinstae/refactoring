@@ -4,10 +4,10 @@ from Employee import SalariedClassification, HourlyClassification, CommissionedC
 from PaymentMethod import HoldMethod
 from PaymentSchedule import MonthlySchedule, WeeklySchedule, BiweeklySchedule
 from PayrollDB import PayrollDB as DB
-from main import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee
+from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, DeleteEmployee
 
 
-class TestAddEmployee(unittest.TestCase):
+class TestEmployee(unittest.TestCase):
 
     def test_add_hourly_employee(self):
         arg_dict = {
@@ -56,6 +56,27 @@ class TestAddEmployee(unittest.TestCase):
             classification=CommissionedClassification,
             schedule=BiweeklySchedule,
             method=HoldMethod
+        )
+
+    def test_delete_employee(self):
+        arg_dict = {
+            'emp_id': 1,
+            'name': "김태희",
+            'address': "파주",
+            'salary': 1000.0,
+            'commission_rate': 0.1
+        }
+        employee = self.new_employee(arg_dict, AddCommissionedEmployee)
+
+        self.assertIsNotNone(
+            DB.get_employee(DB, arg_dict['emp_id'])
+        )
+
+        t = DeleteEmployee(arg_dict['emp_id'])
+        t.execute()
+
+        self.assertIsNone(
+            DB.get_employee(DB, arg_dict['emp_id'])
         )
 
     def new_employee(self, arg_dict, add_employee):

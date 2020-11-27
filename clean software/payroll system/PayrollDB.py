@@ -5,7 +5,7 @@ class PayrollDB:
 
     @staticmethod
     def get_employee(cls, emp_id):
-        return cls.its_employee[emp_id]
+        return cls.its_employee.get(emp_id, None)
 
     @staticmethod
     def add_employee(cls, emp_id, employee):
@@ -14,3 +14,7 @@ class PayrollDB:
     @staticmethod
     def clear(cls):
         cls.its_employee = {}
+
+    @staticmethod
+    def delete_employee(cls, emp_id):
+        del cls.its_employee[emp_id]

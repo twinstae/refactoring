@@ -5,6 +5,7 @@ from abc import *
 from PaymentMethod import HoldMethod
 from PaymentSchedule import PaymentSchedule, MonthlySchedule, WeeklySchedule, BiweeklySchedule
 from PayrollDB import PayrollDB as DB
+from TimeCard import TimeCard
 
 
 class Transaction(metaclass=ABCMeta):
@@ -81,3 +82,48 @@ class AddCommissionedEmployee(AddEmployeeTransaction):
 
     def get_schedule(self):
         return BiweeklySchedule()
+
+
+def no_employee():
+    msg = "id 없음 : 해당하는 employee가 DB에 없습니다."
+    print(msg)
+    return msg
+
+
+class DeleteEmployee(Transaction):
+
+    def __init__(self, emp_id):
+        self.emp_id = emp_id
+
+    def execute(self):
+        if self.emp_id in DB.its_employee:
+            DB.delete_employee(DB, self.emp_id)
+        else:
+            return no_employee()
+
+
+class TimeCardTransaction(Transaction):
+
+    def __init__(self, emp_id, date, hours):
+        self.emp_id = emp_id
+        self.date = date
+        self.hours = hours
+
+    def execute(self):
+        employee = DB.get_employee(DB, self.emp_id)
+        if employee:
+            hc = employee.classification
+            if isinstance(hc, HourlyClassification):
+
+                time_card = TimeCard(
+                    date=self.date,
+                    hours=self.hours
+                )
+
+                hc.add_time_card(time_card)
+            else:
+                msg = "she/he is not a hourly employee"
+                print(msg)
+                return msg
+        else:
+            return no_employee()
