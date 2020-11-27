@@ -11,3 +11,6 @@ class MonthlySchedule(PaymentSchedule):
 
 class WeeklySchedule(PaymentSchedule):
     pass
+
+class BiweeklySchedule(PaymentSchedule):
+    pass

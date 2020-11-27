@@ -1,22 +1,38 @@
 import unittest
 
-from Employee import SalariedClassification, HourlyClassification
+from Employee import SalariedClassification, HourlyClassification, CommissionedClassification
 from PaymentMethod import HoldMethod
-from PaymentSchedule import MonthlySchedule, WeeklySchedule
+from PaymentSchedule import MonthlySchedule, WeeklySchedule, BiweeklySchedule
 from PayrollDB import PayrollDB as DB
-from main import AddSalariedEmployee, AddHourlyEmployee
+from main import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee
 
 
 class TestAddEmployee(unittest.TestCase):
 
-    def test_add_salaried_employee(self):
-        emp_id = 1
-        t = AddSalariedEmployee(emp_id, "김태희", "파주", 1000.0)
-        t.execute()
+    def test_add_hourly_employee(self):
+        arg_dict = {
+            'emp_id': 1,
+            'name': "김태희",
+            'address': "파주",
+            'hourly_rate': 1.0
+        }
+        employee = self.new_employee(arg_dict, AddHourlyEmployee)
 
-        employee = DB.get_employee(DB, emp_id)
-        self.assertEqual(employee.name, "김태희")
-        self.assertEqual(employee.salary, 1000.0)
+        self.classification_schedule_method(
+            employee,
+            classification=HourlyClassification,
+            schedule=WeeklySchedule,
+            method=HoldMethod
+        )
+
+    def test_add_salaried_employee(self):
+        arg_dict = {
+            'emp_id': 1,
+            'name': "김태희",
+            'address': "파주",
+            'salary': 1000.0
+        }
+        employee = self.new_employee(arg_dict, AddSalariedEmployee)
 
         self.classification_schedule_method(
             employee,
@@ -25,21 +41,31 @@ class TestAddEmployee(unittest.TestCase):
             method=HoldMethod
         )
 
-    def test_add_hourly_employee(self):
-        emp_id = 1
-        t = AddHourlyEmployee(emp_id, "김태희", "파주", 1.0)
-        t.execute()
-
-        employee = DB.get_employee(DB, emp_id)
-        self.assertEqual(employee.name, "김태희")
-        self.assertEqual(employee.hourly_rate, 1.0)
+    def test_commissioned_employee(self):
+        arg_dict = {
+            'emp_id': 1,
+            'name': "김태희",
+            'address': "파주",
+            'salary': 1000.0,
+            'commission_rate': 0.1
+        }
+        employee = self.new_employee(arg_dict, AddCommissionedEmployee)
 
         self.classification_schedule_method(
             employee,
-            classification=HourlyClassification,
-            schedule=WeeklySchedule,
+            classification=CommissionedClassification,
+            schedule=BiweeklySchedule,
             method=HoldMethod
         )
+
+    @staticmethod
+    def new_employee(arg_dict, add_employee):
+        t = add_employee(arg_dict)
+        t.execute()
+        employee = DB.get_employee(DB, arg_dict['emp_id'])
+        for attr_name in arg_dict.keys():
+            getattr(employee, attr_name)
+        return employee
 
     def classification_schedule_method(self, employee, classification, schedule, method):
         pc = employee.classification
