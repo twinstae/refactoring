@@ -25,8 +25,16 @@ class CommissionedClassification(PaymentClassification):
     def __init__(self, salary, commission_rate):
         self.hourly_rate = salary
         self.commission_rate = commission_rate
+        self._sales_dict = {}
+
+    def get_sales(self, date):
+        return self._sales_dict.get(date, None)
+
+    def add_sales(self, sales):
+        self._sales_dict[sales.date] = sales
 
 
 class SalariedClassification(PaymentClassification):
     def __init__(self, salary):
         self.hourly_rate = salary
+

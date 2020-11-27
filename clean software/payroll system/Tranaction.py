@@ -5,6 +5,7 @@ from abc import *
 from PaymentMethod import HoldMethod
 from PaymentSchedule import PaymentSchedule, MonthlySchedule, WeeklySchedule, BiweeklySchedule
 from PayrollDB import PayrollDB as DB
+from SalesReceipt import SalesReceipt
 from TimeCard import TimeCard
 
 
@@ -123,6 +124,31 @@ class TimeCardTransaction(Transaction):
                 hc.add_time_card(time_card)
             else:
                 msg = "she/he is not a hourly employee"
+                print(msg)
+                return msg
+        else:
+            return no_employee()
+
+
+class SalesReceiptTransaction(Transaction):
+    def __init__(self, emp_id, date, amount):
+        self.emp_id = emp_id
+        self.date = date
+        self.amount = amount
+
+    def execute(self):
+        employee = DB.get_employee(DB, self.emp_id)
+        if employee:
+            cc = employee.classification
+            if isinstance(cc, CommissionedClassification):
+                cc.add_sales(
+                    sales=SalesReceipt(
+                        date=self.date,
+                        amount=self.amount
+                    )
+                )
+            else:
+                msg = "she/he is not a commissioned employee"
                 print(msg)
                 return msg
         else:
