@@ -1,14 +1,18 @@
 class Employee:
-    def __init__(self, name, emp_id, address):
-        self.name = name
+    def __init__(self,emp_id, name, address):
         self.emp_id = emp_id
+        self.name = name
         self.address = address
 
 
-class HourlyEmployee(Employee):
+class PaymentClassification:
+    pass
 
+class HourlyClassification(PaymentClassification):
+    pass
 
-class CommissionedEmployee(Employee):
+class CommissionedClassification(PaymentClassification):
+    pass
 
-
-class SalariedEmployee(Employee):
+class SalariedClassification(PaymentClassification):
+    pass

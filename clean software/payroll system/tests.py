@@ -1,5 +1,4 @@
 import unittest
-from main import PayrollSystem
 
 sample_transaction = [
     # 직원 추가
@@ -34,7 +33,7 @@ sample_transaction = [
 ]
 
 
-class TestStringMethods(unittest.TestCase):
+class TestPayrollSystem(unittest.TestCase):
 
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')

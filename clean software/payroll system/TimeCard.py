@@ -1,0 +1,2 @@
+class TimeCard:
+    pass
