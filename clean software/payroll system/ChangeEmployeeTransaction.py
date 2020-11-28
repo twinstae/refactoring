@@ -1,4 +1,5 @@
 from Employee import PaymentClassification, SalariedClassification, HourlyClassification, CommissionedClassification
+from PaymentSchedule import PaymentSchedule, WeeklySchedule, BiweeklySchedule, MonthlySchedule
 from Tranaction import Transaction
 from PayrollDB import PayrollDB as DB
 
@@ -41,9 +42,13 @@ class ChangeAddressTransaction(ChangeEmployeeTransaction):
 class ChangeClassificationTransaction(ChangeEmployeeTransaction):
     def change_attr(self):
         self.employee.classification = self.get_classification()
+        self.employee.schedule = self.get_schedule()
 
     def get_classification(self):
         return PaymentClassification()
+
+    def get_schedule(self):
+        return PaymentSchedule()
 
 
 class ChangeHourlyTransaction(ChangeClassificationTransaction):
@@ -53,6 +58,9 @@ class ChangeHourlyTransaction(ChangeClassificationTransaction):
 
     def get_classification(self):
         return HourlyClassification(self.employee.hourly_rate)
+
+    def get_schedule(self):
+        return WeeklySchedule()
 
 
 class ChangeSalariedTransaction(ChangeClassificationTransaction):
@@ -64,6 +72,9 @@ class ChangeSalariedTransaction(ChangeClassificationTransaction):
         return SalariedClassification(
             salary=self.employee.salary
         )
+
+    def get_schedule(self):
+        return MonthlySchedule()
 
 
 class ChangeCommissionedTransaction(ChangeClassificationTransaction):
@@ -77,3 +88,6 @@ class ChangeCommissionedTransaction(ChangeClassificationTransaction):
             salary=self.employee.salary,
             commission_rate=self.employee.commission_rate
         )
+
+    def get_schedule(self):
+        return BiweeklySchedule()
