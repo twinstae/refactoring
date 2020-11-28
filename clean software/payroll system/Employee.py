@@ -1,11 +1,14 @@
 class Employee:
-    def __init__(self, emp_id, name, address, classification, schedule, method):
-        self.emp_id = emp_id
-        self.name = name
-        self.address = address
+    def __init__(self, arg_dict, classification, schedule, method):
+        for attr_name, value in arg_dict.items():
+            setattr(self, attr_name, value)
         self.classification = classification
         self.schedule = schedule
         self.method = method
+        self.affiliation = None
+
+    def set_affiliation(self, affiliation):
+        self.affiliation = affiliation
 
 
 class PaymentClassification:

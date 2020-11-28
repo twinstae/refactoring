@@ -16,7 +16,9 @@ class TestEmployee(unittest.TestCase):
             'address': "파주",
             'hourly_rate': 1.0
         }
-        employee = self.new_employee(arg_dict, AddHourlyEmployee)
+        t = AddHourlyEmployee(arg_dict)
+        t.execute()
+        employee = self.validate_get_employee(arg_dict)
 
         self.classification_schedule_method(
             employee,
@@ -25,14 +27,28 @@ class TestEmployee(unittest.TestCase):
             method=HoldMethod
         )
 
+    def test_add_wrong_hourly_employee(self):
+        arg_dict = {
+            'emp_id': 1,
+            'name': "김태희",
+            'address': "파주",
+            'rate_hour': 1.0
+        }
+        t = AddHourlyEmployee(arg_dict)
+        e = t.execute()
+
+        self.assertEqual(e, 'there is no hourly_rate')
+
     def test_add_salaried_employee(self):
         arg_dict = {
             'emp_id': 1,
             'name': "김태희",
             'address': "파주",
-            'salary': 1000.0
+            'salary': 1000.0,
         }
-        employee = self.new_employee(arg_dict, AddSalariedEmployee)
+        t = AddSalariedEmployee(arg_dict)
+        t.execute()
+        employee = self.validate_get_employee(arg_dict)
 
         self.classification_schedule_method(
             employee,
@@ -49,7 +65,9 @@ class TestEmployee(unittest.TestCase):
             'salary': 1000.0,
             'commission_rate': 0.1
         }
-        employee = self.new_employee(arg_dict, AddCommissionedEmployee)
+        t = AddCommissionedEmployee(arg_dict)
+        t.execute()
+        employee = self.validate_get_employee(arg_dict)
 
         self.classification_schedule_method(
             employee,
@@ -66,10 +84,12 @@ class TestEmployee(unittest.TestCase):
             'salary': 1000.0,
             'commission_rate': 0.1
         }
-        employee = self.new_employee(arg_dict, AddCommissionedEmployee)
+        t = AddCommissionedEmployee(arg_dict)
+        t.execute()
+        employee = self.validate_get_employee(arg_dict)
 
-        self.assertIsNotNone(
-            DB.get_employee(DB, arg_dict['emp_id'])
+        self.assertEqual(
+            DB.get_employee(DB, arg_dict['emp_id']), employee
         )
 
         t = DeleteEmployee(arg_dict['emp_id'])
@@ -79,9 +99,7 @@ class TestEmployee(unittest.TestCase):
             DB.get_employee(DB, arg_dict['emp_id'])
         )
 
-    def new_employee(self, arg_dict, add_employee):
-        t = add_employee(arg_dict)
-        t.execute()
+    def validate_get_employee(self, arg_dict):
         employee = DB.get_employee(DB, arg_dict['emp_id'])
         for attr_name, attr_value in arg_dict.items():
             self.assertTrue(getattr(employee, attr_name) == attr_value)
