@@ -1,5 +1,7 @@
 class Employee:
     def __init__(self, arg_dict, classification, schedule, method):
+        self.name = None
+        self.address = None
         for attr_name, value in arg_dict.items():
             setattr(self, attr_name, value)
         self.classification = classification
@@ -7,8 +9,23 @@ class Employee:
         self.method = method
         self.affiliation = None
 
+        if not self.name:
+            raise NoNameError
+        if not self.address:
+            raise NoAddressError
+
     def set_affiliation(self, affiliation):
         self.affiliation = affiliation
+
+
+class NoNameError(Exception):
+    def __str__(self):
+        return "arg에 name이 없습니다"
+
+
+class NoAddressError(Exception):
+    def __str__(self):
+        return "arg에 address가 없습니다"
 
 
 class PaymentClassification:

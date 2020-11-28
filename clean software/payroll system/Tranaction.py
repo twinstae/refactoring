@@ -20,6 +20,9 @@ class AddEmployeeTransaction(Transaction):
         self.args = arg_dict
 
     def execute(self):
+        if 'emp_id' not in self.args:
+            raise NoEmpIdError
+
         e = self.get_employee()
         DB.add_employee(DB, self.args['emp_id'], e)
         return e
@@ -42,6 +45,11 @@ class AddEmployeeTransaction(Transaction):
     @staticmethod
     def get_schedule():
         pass
+
+
+class NoEmpIdError(Exception):
+    def __str__(self):
+        return "arg에 emp_id가 없습니다"
 
 
 class AddHourlyEmployee(AddEmployeeTransaction):

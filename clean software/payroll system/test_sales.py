@@ -66,7 +66,6 @@ class TestTimeCard(unittest.TestCase):
             )
             t.execute()
 
-
     def test_wrong_employee(self):
         with self.assertRaises(NotCommissionedError):
             t = SalesReceiptTransaction(

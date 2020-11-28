@@ -78,7 +78,6 @@ class TestChangeEmployee(unittest.TestCase):
         t = ChangeHourlyTransaction(self.commission_id, 10)
         self.change_cls(
             t,
-            self.commission_id,
             HourlyClassification,
             WeeklySchedule
         )
@@ -87,7 +86,6 @@ class TestChangeEmployee(unittest.TestCase):
         t = ChangeSalariedTransaction(self.hourly_id, 1000)
         self.change_cls(
             t,
-            self.hourly_id,
             SalariedClassification,
             MonthlySchedule
         )
@@ -96,14 +94,13 @@ class TestChangeEmployee(unittest.TestCase):
         t = ChangeCommissionedTransaction(self.hourly_id, 1000, 0.1)
         self.change_cls(
             t,
-            self.hourly_id,
             CommissionedClassification,
             BiweeklySchedule
         )
 
-    def change_cls(self, t, emp_id, cls, schedule_cls):
+    def change_cls(self, t, cls, schedule_cls):
         t.execute()
-        new_employee = DB.get_employee(DB, emp_id=emp_id)
+        new_employee = DB.get_employee(DB, emp_id=t.emp_id)
         self.assertIsInstance(new_employee.classification, cls)
         self.assertIsInstance(new_employee.schedule, schedule_cls)
 
