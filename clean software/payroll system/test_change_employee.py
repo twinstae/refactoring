@@ -3,6 +3,7 @@ import unittest
 from ChangeEmployeeTransaction import ChangeNameTransaction, ChangeAddressTransaction, ChangeSalariedTransaction, \
     ChangeHourlyTransaction, ChangeCommissionedTransaction
 from Employee import HourlyClassification, SalariedClassification, CommissionedClassification
+from PaymentSchedule import BiweeklySchedule, MonthlySchedule, WeeklySchedule
 from PayrollDB import PayrollDB as DB, NoEmployeeError
 from Tranaction import AddHourlyEmployee, AddCommissionedEmployee
 
@@ -60,7 +61,7 @@ class TestChangeEmployee(unittest.TestCase):
         new_employee = DB.get_employee(DB, emp_id=self.hourly_id)
         self.assertEqual(new_employee.address, new_address)
 
-    def test_change_address_of_wrong_employee(self):
+    def test_change_wrong_employee(self):
         new_value = "의미 없는 값"
         transaction_list = [
             ChangeAddressTransaction,
@@ -75,20 +76,36 @@ class TestChangeEmployee(unittest.TestCase):
 
     def test_change_hourly(self):
         t = ChangeHourlyTransaction(self.commission_id, 10)
-        self.change_cls(t, self.commission_id, HourlyClassification)
+        self.change_cls(
+            t,
+            self.commission_id,
+            HourlyClassification,
+            WeeklySchedule
+        )
 
     def test_change_salaried(self):
         t = ChangeSalariedTransaction(self.hourly_id, 1000)
-        self.change_cls(t, self.hourly_id, SalariedClassification)
+        self.change_cls(
+            t,
+            self.hourly_id,
+            SalariedClassification,
+            MonthlySchedule
+        )
 
     def test_change_commissioned(self):
         t = ChangeCommissionedTransaction(self.hourly_id, 1000, 0.1)
-        self.change_cls(t, self.hourly_id, CommissionedClassification)
+        self.change_cls(
+            t,
+            self.hourly_id,
+            CommissionedClassification,
+            BiweeklySchedule
+        )
 
-    def change_cls(self, t, emp_id, cls):
+    def change_cls(self, t, emp_id, cls, schedule_cls):
         t.execute()
         new_employee = DB.get_employee(DB, emp_id=emp_id)
         self.assertIsInstance(new_employee.classification, cls)
+        self.assertIsInstance(new_employee.schedule, schedule_cls)
 
 
 if __name__ == '__main__':
