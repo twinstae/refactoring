@@ -12,6 +12,10 @@ class PayrollDB:
         cls.its_employee[emp_id] = employee
 
     @staticmethod
+    def change_employee(cls, emp_id, new_employee):
+        cls.its_employee[emp_id] = new_employee
+
+    @staticmethod
     def clear(cls):
         cls.its_employee = {}
 
