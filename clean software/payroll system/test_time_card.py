@@ -1,7 +1,7 @@
 import unittest
 
-from Employee import HourlyClassification
-from PayrollDB import PayrollDB as DB
+from Employee import HourlyClassification, NoTimeCardError
+from PayrollDB import PayrollDB as DB, NoEmployeeError
 from TimeCard import TimeCard
 from Tranaction import AddHourlyEmployee, TimeCardTransaction
 
@@ -27,6 +27,9 @@ class TestTimeCard(unittest.TestCase):
             add_employee=AddHourlyEmployee
         )
 
+        self.hc = self.employee.classification
+        self.assertIsInstance(self.hc, HourlyClassification)
+
     def tearDown(self) -> None:
         DB.clear(DB)
 
@@ -37,27 +40,22 @@ class TestTimeCard(unittest.TestCase):
             hours=8.0
         )
         t.execute()
-        hc = self.employee.classification
-        self.assertIsInstance(hc, HourlyClassification)
 
-        tc = hc.get_time_card(20011031)
+        tc = self.hc.get_time_card(20011031)
         self.assertIsInstance(tc, TimeCard)
         self.assertEqual(tc.hours, 8.0)
 
     def test_add_and_get_wrong_time_card(self):
-        t = TimeCardTransaction(
-            emp_id=987,
-            date=20011031,
-            hours=8.0
-        )
-        msg = t.execute()
-        self.assertEqual(msg, "id 없음 : 해당하는 employee가 DB에 없습니다.")
+        with self.assertRaises(NoEmployeeError):
+            t = TimeCardTransaction(
+                emp_id=987,
+                date=20011031,
+                hours=8.0
+            )
+            t.execute()
 
-        hc = self.employee.classification
-        self.assertIsInstance(hc, HourlyClassification)
-
-        tc = hc.get_time_card(99990909)
-        self.assertEqual(tc, None)
+        with self.assertRaises(NoTimeCardError):
+            tc = self.hc.get_time_card(99990909)
 
 
 if __name__ == '__main__':

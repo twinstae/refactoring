@@ -1,9 +1,9 @@
 import unittest
 
-from Employee import CommissionedClassification
-from PayrollDB import PayrollDB as DB
+from Employee import CommissionedClassification, NoSalesError
+from PayrollDB import PayrollDB as DB, NoEmployeeError
 from SalesReceipt import SalesReceipt
-from Tranaction import SalesReceiptTransaction, AddCommissionedEmployee, AddHourlyEmployee
+from Tranaction import SalesReceiptTransaction, AddCommissionedEmployee, AddHourlyEmployee, NotCommissionedError
 
 
 class TestTimeCard(unittest.TestCase):
@@ -39,6 +39,9 @@ class TestTimeCard(unittest.TestCase):
             add_employee=AddHourlyEmployee
         )
 
+        self.cc = self.employee.classification
+        self.assertIsInstance(self.cc, CommissionedClassification)
+
     def tearDown(self) -> None:
         DB.clear(DB)
 
@@ -49,34 +52,30 @@ class TestTimeCard(unittest.TestCase):
             amount=8.0
         )
         t.execute()
-        cc = self.employee.classification
-        self.assertIsInstance(cc, CommissionedClassification)
 
-        sr = cc.get_sales(20011031)
+        sr = self.cc.get_sales(20011031)
         self.assertIsInstance(sr, SalesReceipt)
         self.assertEqual(sr.amount, 8.0)
 
     def test_wrong_id(self):
-        t = SalesReceiptTransaction(
-            emp_id=987,
-            date=20011031,
-            amount=8.0
-        )
-        msg = t.execute()
-        self.assertEqual(msg, "id 없음 : 해당하는 employee가 DB에 없습니다.")
+        with self.assertRaises(NoEmployeeError):
+            t = SalesReceiptTransaction(
+                emp_id=987,
+                date=20011031,
+                amount=8.0
+            )
+            t.execute()
+
 
     def test_wrong_employee(self):
-        t = SalesReceiptTransaction(
-            emp_id=2,
-            date=20011031,
-            amount=8.0
-        )
-        msg = t.execute()
-        self.assertEqual(msg, "she/he is not a commissioned employee")
+        with self.assertRaises(NotCommissionedError):
+            t = SalesReceiptTransaction(
+                emp_id=2,
+                date=20011031,
+                amount=8.0
+            )
+            t.execute()
 
     def test_get_wrong_date(self):
-        cc = self.employee.classification
-        self.assertIsInstance(cc, CommissionedClassification)
-
-        tc = cc.get_sales(99990909)
-        self.assertEqual(tc, None)
+        with self.assertRaises(NoSalesError):
+            tc = self.cc.get_sales(99990909)

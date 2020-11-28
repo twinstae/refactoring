@@ -21,14 +21,11 @@ class AddEmployeeTransaction(Transaction):
 
     def execute(self):
         e = self.get_employee()
-        if isinstance(e, Employee):
-            DB.add_employee(DB, self.args['emp_id'], e)
+        DB.add_employee(DB, self.args['emp_id'], e)
         return e
 
     def get_employee(self):
         cls = self.get_classification()
-        if not isinstance(cls, PaymentClassification):  # 에러메세지이면
-            return cls
 
         e = Employee(
             arg_dict=self.args,
@@ -49,8 +46,8 @@ class AddEmployeeTransaction(Transaction):
 
 class AddHourlyEmployee(AddEmployeeTransaction):
     def get_classification(self):
-        if not self.args.get('hourly_rate', None):
-            return 'there is no hourly_rate'
+        if 'hourly_rate' not in self.args:
+            raise NoHourlyError
         return HourlyClassification(self.args['hourly_rate'])
 
     @staticmethod
@@ -58,23 +55,34 @@ class AddHourlyEmployee(AddEmployeeTransaction):
         return WeeklySchedule()
 
 
+class NoHourlyError(Exception):
+    def __str__(self):
+        return "arg에 hourly_rate가 없습니다"
+
+
 class AddSalariedEmployee(AddEmployeeTransaction):
     def get_classification(self):
-        if not self.args.get('salary', None):
-            return 'there is no salary'
+        if 'salary' not in self.args:
+            raise NoSalaryError
         return SalariedClassification(self.args['salary'])
 
     def get_schedule(self):
         return MonthlySchedule()
 
 
+class NoSalaryError(Exception):
+    def __str__(self):
+        return "arg에 salary가 없습니다"
+
+
 class AddCommissionedEmployee(AddEmployeeTransaction):
     def get_classification(self):
 
-        for key in ['salary', 'commission_rate']:
-            value = self.args.get(key, None)
-            if not value:
-                return 'there is no '+key
+        if 'salary' not in self.args:
+            raise NoSalaryError
+
+        if 'commission_rate' not in self.args:
+            raise NoCommissionError
 
         return CommissionedClassification(
             salary=self.args['salary'],
@@ -85,10 +93,9 @@ class AddCommissionedEmployee(AddEmployeeTransaction):
         return BiweeklySchedule()
 
 
-def no_employee():
-    msg = "id 없음 : 해당하는 employee가 DB에 없습니다."
-    print(msg)
-    return msg
+class NoCommissionError(Exception):
+    def __str__(self):
+        return "arg에 commission_rate가 없습니다"
 
 
 class DeleteEmployee(Transaction):
@@ -96,10 +103,7 @@ class DeleteEmployee(Transaction):
         self.emp_id = emp_id
 
     def execute(self):
-        if self.emp_id in DB.its_employee:
-            DB.delete_employee(DB, self.emp_id)
-        else:
-            return no_employee()
+        DB.delete_employee(DB, self.emp_id)
 
 
 class TimeCardTransaction(Transaction):
@@ -110,22 +114,23 @@ class TimeCardTransaction(Transaction):
 
     def execute(self):
         employee = DB.get_employee(DB, self.emp_id)
-        if employee:
-            hc = employee.classification
-            if isinstance(hc, HourlyClassification):
 
-                time_card = TimeCard(
-                    date=self.date,
-                    hours=self.hours
-                )
+        hc = employee.classification
+        if isinstance(hc, HourlyClassification):
 
-                hc.add_time_card(time_card)
-            else:
-                msg = "she/he is not a hourly employee"
-                print(msg)
-                return msg
+            time_card = TimeCard(
+                date=self.date,
+                hours=self.hours
+            )
+
+            hc.add_time_card(time_card)
         else:
-            return no_employee()
+            raise NotHourlyError
+
+
+class NotHourlyError(Exception):
+    def __str__(self):
+        return "hourly employee가 아닙니다."
 
 
 class SalesReceiptTransaction(Transaction):
@@ -136,18 +141,19 @@ class SalesReceiptTransaction(Transaction):
 
     def execute(self):
         employee = DB.get_employee(DB, self.emp_id)
-        if employee:
-            cc = employee.classification
-            if isinstance(cc, CommissionedClassification):
-                cc.add_sales(
-                    sales=SalesReceipt(
-                        date=self.date,
-                        amount=self.amount
-                    )
+
+        cc = employee.classification
+        if isinstance(cc, CommissionedClassification):
+            cc.add_sales(
+                sales=SalesReceipt(
+                    date=self.date,
+                    amount=self.amount
                 )
-            else:
-                msg = "she/he is not a commissioned employee"
-                print(msg)
-                return msg
+            )
         else:
-            return no_employee()
+            raise NotCommissionedError
+
+
+class NotCommissionedError(Exception):
+    def __str__(self):
+        return "commissioned employee가 아닙니다."

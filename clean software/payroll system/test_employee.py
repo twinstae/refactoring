@@ -3,8 +3,8 @@ import unittest
 from Employee import SalariedClassification, HourlyClassification, CommissionedClassification
 from PaymentMethod import HoldMethod
 from PaymentSchedule import MonthlySchedule, WeeklySchedule, BiweeklySchedule
-from PayrollDB import PayrollDB as DB
-from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, DeleteEmployee
+from PayrollDB import PayrollDB as DB, NoEmployeeError
+from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, DeleteEmployee, NoHourlyError
 
 
 class TestEmployee(unittest.TestCase):
@@ -34,10 +34,9 @@ class TestEmployee(unittest.TestCase):
             'address': "파주",
             'rate_hour': 1.0
         }
-        t = AddHourlyEmployee(arg_dict)
-        e = t.execute()
-
-        self.assertEqual(e, 'there is no hourly_rate')
+        with self.assertRaises(NoHourlyError):
+            t = AddHourlyEmployee(arg_dict)
+            t.execute()
 
     def test_add_salaried_employee(self):
         arg_dict = {
@@ -95,9 +94,8 @@ class TestEmployee(unittest.TestCase):
         t = DeleteEmployee(arg_dict['emp_id'])
         t.execute()
 
-        self.assertIsNone(
+        with self.assertRaises(NoEmployeeError):
             DB.get_employee(DB, arg_dict['emp_id'])
-        )
 
     def validate_get_employee(self, arg_dict):
         employee = DB.get_employee(DB, arg_dict['emp_id'])

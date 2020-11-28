@@ -21,10 +21,17 @@ class HourlyClassification(PaymentClassification):
         self._time_card_dict = {}
 
     def get_time_card(self, date):
-        return self._time_card_dict.get(date, None)
+        if date not in self._time_card_dict:
+            raise NoTimeCardError
+        return self._time_card_dict[date]
 
     def add_time_card(self, time_card):
         self._time_card_dict[time_card.date] = time_card
+
+
+class NoTimeCardError(Exception):
+    def __str__(self):
+        return "date에 time_card가 없습니다"
 
 
 class CommissionedClassification(PaymentClassification):
@@ -34,7 +41,9 @@ class CommissionedClassification(PaymentClassification):
         self._sales_dict = {}
 
     def get_sales(self, date):
-        return self._sales_dict.get(date, None)
+        if date not in self._sales_dict:
+            raise NoSalesError
+        return self._sales_dict[date]
 
     def add_sales(self, sales):
         self._sales_dict[sales.date] = sales
@@ -43,4 +52,9 @@ class CommissionedClassification(PaymentClassification):
 class SalariedClassification(PaymentClassification):
     def __init__(self, salary):
         self.salary = salary
+
+
+class NoSalesError(Exception):
+    def __str__(self):
+        return "date에 sales가 없습니다"
 
