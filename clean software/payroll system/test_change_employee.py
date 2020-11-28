@@ -1,11 +1,10 @@
 import unittest
 
-from ChangeEmployeeTransaction import ChangeNameTransaction
-from Employee import SalariedClassification, HourlyClassification, CommissionedClassification
-from PaymentMethod import HoldMethod
-from PaymentSchedule import MonthlySchedule, WeeklySchedule, BiweeklySchedule
-from PayrollDB import PayrollDB as DB
-from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, DeleteEmployee
+from ChangeEmployeeTransaction import ChangeNameTransaction, ChangeAddressTransaction, ChangeSalariedTransaction, \
+    ChangeHourlyTransaction, ChangeCommissionedTransaction
+from Employee import HourlyClassification, SalariedClassification, CommissionedClassification
+from PayrollDB import PayrollDB as DB, NoEmployeeError
+from Tranaction import AddHourlyEmployee, AddCommissionedEmployee
 
 
 class TestChangeEmployee(unittest.TestCase):
@@ -48,11 +47,48 @@ class TestChangeEmployee(unittest.TestCase):
             new_name=new_name
         )
         t.execute()
+        new_employee = DB.get_employee(DB, emp_id=self.hourly_id)
+        self.assertEqual(new_employee.name, new_name)
 
-        the_employee = DB.get_employee(DB, emp_id=self.hourly_id)
+    def test_change_address(self):
+        new_address = "서울"
+        t = ChangeAddressTransaction(
+            emp_id=self.hourly_id,
+            new_address=new_address
+        )
+        t.execute()
+        new_employee = DB.get_employee(DB, emp_id=self.hourly_id)
+        self.assertEqual(new_employee.address, new_address)
 
-        self.assertEqual(the_employee.name, new_name)
+    def test_change_address_of_wrong_employee(self):
+        new_value = "의미 없는 값"
+        transaction_list = [
+            ChangeAddressTransaction,
+            ChangeNameTransaction,
+            ChangeSalariedTransaction,
+            ChangeHourlyTransaction
+        ]
+        for transaction in transaction_list:
+            with self.assertRaises(NoEmployeeError):
+                t = transaction(987, new_value)
+                t.execute()
 
+    def test_change_hourly(self):
+        t = ChangeHourlyTransaction(self.commission_id, 10)
+        self.change_cls(t, self.commission_id, HourlyClassification)
+
+    def test_change_salaried(self):
+        t = ChangeSalariedTransaction(self.hourly_id, 1000)
+        self.change_cls(t, self.hourly_id, SalariedClassification)
+
+    def test_change_commissioned(self):
+        t = ChangeCommissionedTransaction(self.hourly_id, 1000, 0.1)
+        self.change_cls(t, self.hourly_id, CommissionedClassification)
+
+    def change_cls(self, t, emp_id, cls):
+        t.execute()
+        new_employee = DB.get_employee(DB, emp_id=emp_id)
+        self.assertIsInstance(new_employee.classification, cls)
 
 
 if __name__ == '__main__':
