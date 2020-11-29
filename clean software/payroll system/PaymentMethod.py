@@ -2,13 +2,24 @@ from abc import *
 
 
 class PaymentMethod(metaclass=ABCMeta):
-    pass
+    @staticmethod
+    def pay(pc):
+        pass
+
 
 class HoldMethod(PaymentMethod):
-    pass
+    @staticmethod
+    def pay(pc):
+        pc.disposition = "Hold"
+
 
 class DirectMethod(PaymentMethod):
-    pass
+    @staticmethod
+    def pay(pc):
+        pass
+
 
 class MailMethod(PaymentMethod):
-    pass
+    @staticmethod
+    def pay(pc):
+        pass

@@ -24,7 +24,7 @@ class AddEmployeeTransaction(Transaction):
             raise NoEmpIdError
 
         e = self.get_employee()
-        DB.add_employee(DB, self.args['emp_id'], e)
+        DB.add_employee(self.args['emp_id'], e)
         return e
 
     def get_employee(self):
@@ -111,7 +111,7 @@ class DeleteEmployee(Transaction):
         self.emp_id = emp_id
 
     def execute(self):
-        DB.delete_employee(DB, self.emp_id)
+        DB.delete_employee(self.emp_id)
 
 
 class TimeCardTransaction(Transaction):
@@ -121,7 +121,7 @@ class TimeCardTransaction(Transaction):
         self.hours = hours
 
     def execute(self):
-        employee = DB.get_employee(DB, self.emp_id)
+        employee = DB.get_employee(self.emp_id)
 
         hc = employee.classification
         if isinstance(hc, HourlyClassification):
@@ -148,7 +148,7 @@ class SalesReceiptTransaction(Transaction):
         self.amount = amount
 
     def execute(self):
-        employee = DB.get_employee(DB, self.emp_id)
+        employee = DB.get_employee(self.emp_id)
 
         cc = employee.classification
         if isinstance(cc, CommissionedClassification):

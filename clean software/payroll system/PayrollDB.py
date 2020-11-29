@@ -6,33 +6,45 @@ class PayrollDB:
     # key : id
     # value : Employee
 
-    @staticmethod
+    @classmethod
     def get_employee(cls, emp_id):
-        PayrollDB.check(cls, emp_id)
+        PayrollDB.check(emp_id)
         return cls.its_employee[emp_id]
 
-    @staticmethod
+    @classmethod
     def check(cls, emp_id):
         if emp_id not in cls.its_employee:
             raise NoEmployeeError
 
-    @staticmethod
+    @classmethod
     def add_employee(cls, emp_id, employee):
         cls.its_employee[emp_id] = employee
 
-    @staticmethod
+    @classmethod
     def change_employee(cls, emp_id, new_employee):
-        PayrollDB.check(cls, emp_id)
+        PayrollDB.check(emp_id)
         cls.its_employee[emp_id] = new_employee
 
-    @staticmethod
+    @classmethod
     def clear(cls):
         cls.its_employee = {}
 
-    @staticmethod
+    @classmethod
     def delete_employee(cls, emp_id):
-        PayrollDB.check(cls, emp_id)
+        PayrollDB.check(emp_id)
         del cls.its_employee[emp_id]
+
+    @classmethod
+    def get_all_emp_id(cls):
+        return cls.its_employee.keys()
+
+    @classmethod
+    def get_all_employees(cls):
+        return cls.its_employee.values()
+
+    @classmethod
+    def get_all_employees_with_pay_day(cls, date):
+        return [e for e in cls.get_all_employees() if e.is_pay_day(date)]
 
 
 class NoEmployeeError(Exception):

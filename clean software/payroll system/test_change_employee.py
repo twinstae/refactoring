@@ -33,10 +33,10 @@ class TestChangeEmployee(unittest.TestCase):
         self.commission_id = arg_dict2['emp_id']
 
     def tearDown(self) -> None:
-        DB.clear(DB)
+        DB.clear()
 
     def validate_get_employee(self, arg_dict):
-        employee = DB.get_employee(DB, arg_dict['emp_id'])
+        employee = DB.get_employee(arg_dict['emp_id'])
         for attr_name, attr_value in arg_dict.items():
             self.assertTrue(getattr(employee, attr_name) == attr_value)
         return employee
@@ -48,7 +48,7 @@ class TestChangeEmployee(unittest.TestCase):
             new_name=new_name
         )
         t.execute()
-        new_employee = DB.get_employee(DB, emp_id=self.hourly_id)
+        new_employee = DB.get_employee(emp_id=self.hourly_id)
         self.assertEqual(new_employee.name, new_name)
 
     def test_change_address(self):
@@ -58,7 +58,7 @@ class TestChangeEmployee(unittest.TestCase):
             new_address=new_address
         )
         t.execute()
-        new_employee = DB.get_employee(DB, emp_id=self.hourly_id)
+        new_employee = DB.get_employee(emp_id=self.hourly_id)
         self.assertEqual(new_employee.address, new_address)
 
     def test_change_wrong_employee(self):
@@ -100,7 +100,7 @@ class TestChangeEmployee(unittest.TestCase):
 
     def change_cls(self, t, cls, schedule_cls):
         t.execute()
-        new_employee = DB.get_employee(DB, emp_id=t.emp_id)
+        new_employee = DB.get_employee(emp_id=t.emp_id)
         self.assertIsInstance(new_employee.classification, cls)
         self.assertIsInstance(new_employee.schedule, schedule_cls)
 

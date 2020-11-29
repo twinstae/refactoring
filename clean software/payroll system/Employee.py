@@ -1,5 +1,8 @@
+from abc import *
+
 class Employee:
     def __init__(self, arg_dict, classification, schedule, method):
+        self.emp_id = None
         self.name = None
         self.address = None
         for attr_name, value in arg_dict.items():
@@ -7,7 +10,7 @@ class Employee:
         self.classification = classification
         self.schedule = schedule
         self.method = method
-        self.affiliation = None
+        self.affiliation = None  # null object
 
         if not self.name:
             raise NoNameError
@@ -16,6 +19,15 @@ class Employee:
 
     def set_affiliation(self, affiliation):
         self.affiliation = affiliation
+
+    def is_pay_day(self, date):
+        return self.schedule.is_pay_day(date)
+
+    def pay_day(self, pc):
+        pc.gross_pay = self.classification.calculate_pay(pc)
+        pc.deduction = 0  # self.affiliation.calculate_deduction(pc)
+        pc.net_pay = pc.gross_pay - pc.deduction
+        self.method.pay(pc)
 
 
 class NoNameError(Exception):
@@ -28,8 +40,9 @@ class NoAddressError(Exception):
         return "arg에 address가 없습니다"
 
 
-class PaymentClassification:
-    pass
+class PaymentClassification(metaclass=ABCMeta):
+    def calculate_pay(self, pc):
+        pass
 
 
 class HourlyClassification(PaymentClassification):
@@ -44,6 +57,9 @@ class HourlyClassification(PaymentClassification):
 
     def add_time_card(self, time_card):
         self._time_card_dict[time_card.date] = time_card
+
+    def calculate_pay(self, pc):
+        pass
 
 
 class NoTimeCardError(Exception):
@@ -65,10 +81,16 @@ class CommissionedClassification(PaymentClassification):
     def add_sales(self, sales):
         self._sales_dict[sales.date] = sales
 
+    def calculate_pay(self, pc):
+        pass
+
 
 class SalariedClassification(PaymentClassification):
     def __init__(self, salary):
         self.salary = salary
+
+    def calculate_pay(self, pc):
+        return self.salary
 
 
 class NoSalesError(Exception):

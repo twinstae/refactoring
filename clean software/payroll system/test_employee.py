@@ -29,49 +29,46 @@ class TestEmployee(unittest.TestCase):
             method=HoldMethod
         )
 
+    def raise_assert(self, e):
+        with self.assertRaises(e):
+            t = AddHourlyEmployee(self.arg_dict)
+            t.execute()
+
     def test_add_wrong_hourly_employee(self):
-        arg_dict = {
+        self.arg_dict = {
             'emp_id': 1,
             'name': "김태희",
             'address': "파주",
             'rate_hour': 1.0
         }
-        with self.assertRaises(NoHourlyError):
-            t = AddHourlyEmployee(arg_dict)
-            t.execute()
+        self.raise_assert(NoHourlyError)
 
     def test_add_wrong_name_employee(self):
-        arg_dict = {
+        self.arg_dict = {
             'emp_id': 1,
             'title': "김태희",
             'address': "파주",
             'hourly_rate': 1.0
         }
-        with self.assertRaises(NoNameError):
-            t = AddHourlyEmployee(arg_dict)
-            t.execute()
+        self.raise_assert(NoNameError)
 
     def test_add_wrong_address_employee(self):
-        arg_dict = {
+        self.arg_dict = {
             'emp_id': 1,
             'name': "김태희",
             'addres': "파주",
             'hourly_rate': 1.0
         }
-        with self.assertRaises(NoAddressError):
-            t = AddHourlyEmployee(arg_dict)
-            t.execute()
+        self.raise_assert(NoAddressError)
 
     def test_add_wrong_id_employee(self):
-        arg_dict = {
+        self.arg_dict = {
             'id': 1,
             'title': "김태희",
             'address': "파주",
             'hourly_rate': 1.0
         }
-        with self.assertRaises(NoEmpIdError):
-            t = AddHourlyEmployee(arg_dict)
-            t.execute()
+        self.raise_assert(NoEmpIdError)
 
     def test_add_salaried_employee(self):
         arg_dict = {

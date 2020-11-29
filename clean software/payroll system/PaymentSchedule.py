@@ -1,4 +1,6 @@
 from abc import *
+import calendar
+from datetime import date
 
 
 class PaymentSchedule(metaclass=ABCMeta):
@@ -6,7 +8,9 @@ class PaymentSchedule(metaclass=ABCMeta):
 
 
 class MonthlySchedule(PaymentSchedule):
-    pass
+    @staticmethod
+    def is_pay_day(pay_date: date):
+        return pay_date.day == calendar.monthrange(pay_date.year, pay_date.month)[1]
 
 
 class WeeklySchedule(PaymentSchedule):

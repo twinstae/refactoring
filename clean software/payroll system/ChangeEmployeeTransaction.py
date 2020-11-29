@@ -7,12 +7,11 @@ from PayrollDB import PayrollDB as DB
 class ChangeEmployeeTransaction(Transaction):
     def __init__(self, emp_id):
         self.emp_id = emp_id
-        self.employee = DB.get_employee(DB, emp_id)
+        self.employee = DB.get_employee(emp_id)
 
     def execute(self):
         self.change_attr()
         DB.change_employee(
-            DB,
             emp_id=self.emp_id,
             new_employee=self.employee
         )
