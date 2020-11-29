@@ -97,7 +97,7 @@ class TestPay(unittest.TestCase):
 
     def pay_hourly(self, pay_date, hours):
         self.add_time_card()
-        pc = self.pay_check(pay_date, self.hourly_dict.emp_id)
+        pc = self.pay_check(pay_date, self.hourly_dict['emp_id'])
         gross_pay = self.hourly_dict['hourly_rate'] * hours  # 0시간 일함
         self.check_pc(gross_pay, pay_date, pc)
 
