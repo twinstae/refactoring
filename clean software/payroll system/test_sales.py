@@ -1,4 +1,5 @@
 import unittest
+from datetime import date
 
 from Employee import CommissionedClassification, NoSalesError
 from PayrollDB import PayrollDB as DB, NoEmployeeError
@@ -10,7 +11,7 @@ class TestTimeCard(unittest.TestCase):
     def new_employee(self, arg_dict, add_employee):
         t = add_employee(arg_dict)
         t.execute()
-        employee = DB.get_employee(DB, arg_dict['emp_id'])
+        employee = DB.get_employee(arg_dict['emp_id'])
         for attr_name, attr_value in arg_dict.items():
             self.assertTrue(getattr(employee, attr_name) == attr_value)
         return employee
@@ -43,17 +44,17 @@ class TestTimeCard(unittest.TestCase):
         self.assertIsInstance(self.cc, CommissionedClassification)
 
     def tearDown(self) -> None:
-        DB.clear(DB)
+        DB.clear()
 
     def test_transaction(self):
         t = SalesReceiptTransaction(
             emp_id=self.arg_dict['emp_id'],
-            date=20011031,
+            date=date(2001, 10, 31),
             amount=8.0
         )
         t.execute()
 
-        sr = self.cc.get_sales(20011031)
+        sr = self.cc.get_sales(date(2001, 10, 31))
         self.assertIsInstance(sr, SalesReceipt)
         self.assertEqual(sr.amount, 8.0)
 
@@ -61,7 +62,7 @@ class TestTimeCard(unittest.TestCase):
         with self.assertRaises(NoEmployeeError):
             t = SalesReceiptTransaction(
                 emp_id=987,
-                date=20011031,
+                date=date(2001, 10, 31),
                 amount=8.0
             )
             t.execute()
@@ -70,11 +71,11 @@ class TestTimeCard(unittest.TestCase):
         with self.assertRaises(NotCommissionedError):
             t = SalesReceiptTransaction(
                 emp_id=2,
-                date=20011031,
+                date=date(2001, 10, 31),
                 amount=8.0
             )
             t.execute()
 
     def test_get_wrong_date(self):
         with self.assertRaises(NoSalesError):
-            tc = self.cc.get_sales(99990909)
+            tc = self.cc.get_sales(date(9999, 10, 31))

@@ -1,4 +1,6 @@
 from abc import *
+from datetime import timedelta
+
 
 class Employee:
     def __init__(self, arg_dict, classification, schedule, method):
@@ -59,7 +61,15 @@ class HourlyClassification(PaymentClassification):
         self._time_card_dict[time_card.date] = time_card
 
     def calculate_pay(self, pc):
-        pass
+        hours = sum([s.hours for s in self.get_times_for(pc)])
+        return hours * self.hourly_rate
+
+    def get_times_for(self, pc):
+        end = pc.pay_date
+        week = [end - timedelta(days=i) for i in range(7)]
+        return [self._time_card_dict.get(d, None)
+                for d in week
+                if self._time_card_dict.get(d, None)]
 
 
 class NoTimeCardError(Exception):
@@ -82,7 +92,16 @@ class CommissionedClassification(PaymentClassification):
         self._sales_dict[sales.date] = sales
 
     def calculate_pay(self, pc):
-        pass
+        sales = sum([s.amount for s in self.get_sales_for(pc)])
+        commission = sales * self.commission_rate
+        return self.salary + commission
+
+    def get_sales_for(self, pc):
+        end = pc.pay_date
+        biweek = [end - timedelta(days=i) for i in range(14)]
+        return [self._sales_dict.get(d, None)
+                for d in biweek
+                if self._sales_dict.get(d, None)]
 
 
 class SalariedClassification(PaymentClassification):

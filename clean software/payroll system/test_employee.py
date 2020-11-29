@@ -120,17 +120,17 @@ class TestEmployee(unittest.TestCase):
         employee = self.validate_get_employee(arg_dict)
 
         self.assertEqual(
-            DB.get_employee(DB, arg_dict['emp_id']), employee
+            DB.get_employee(arg_dict['emp_id']), employee
         )
 
         t = DeleteEmployee(arg_dict['emp_id'])
         t.execute()
 
         with self.assertRaises(NoEmployeeError):
-            DB.get_employee(DB, arg_dict['emp_id'])
+            DB.get_employee(arg_dict['emp_id'])
 
     def validate_get_employee(self, arg_dict):
-        employee = DB.get_employee(DB, arg_dict['emp_id'])
+        employee = DB.get_employee(arg_dict['emp_id'])
         for attr_name, attr_value in arg_dict.items():
             self.assertTrue(getattr(employee, attr_name) == attr_value)
         return employee
