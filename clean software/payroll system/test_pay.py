@@ -2,7 +2,6 @@ import unittest
 
 from datetime import date
 
-from Employee import SalariedClassification
 from PayDayTransaction import PayDayTransaction
 from PaymentSchedule import MonthlySchedule
 from PayrollDB import PayrollDB as DB
@@ -44,7 +43,6 @@ class TestPay(unittest.TestCase):
         }
         t2 = AddHourlyEmployee(self.hourly_dict)
         t2.execute()
-        self.hourly_employee = self.validate_get_employee(self.hourly_dict)
 
         self.commissioned_dict = {
             'emp_id': 3,
@@ -55,7 +53,6 @@ class TestPay(unittest.TestCase):
         }
         t3 = AddCommissionedEmployee(self.commissioned_dict)
         t3.execute()
-        self.commissioned_employee = self.validate_get_employee(self.commissioned_dict)
 
     def tearDown(self) -> None:
         DB.clear()
@@ -100,7 +97,7 @@ class TestPay(unittest.TestCase):
 
     def pay_hourly(self, pay_date, hours):
         self.add_time_card()
-        pc = self.pay_check(pay_date, self.hourly_employee.emp_id)
+        pc = self.pay_check(pay_date, self.hourly_dict.emp_id)
         gross_pay = self.hourly_dict['hourly_rate'] * hours  # 0시간 일함
         self.check_pc(gross_pay, pay_date, pc)
 
@@ -119,13 +116,13 @@ class TestPay(unittest.TestCase):
     def test_pay_single_hourly_after(self):
         self.pay_hourly(
             pay_date=date(2020, 12, 4),
-            hours = 0
+            hours=0
         )
 
     def add_sales(self):
         t = SalesReceiptTransaction(
             emp_id=self.commissioned_dict['emp_id'],
-            date=date(2020, 11, 14), #경계값
+            date=date(2020, 11, 14),  # 경계값
             amount=1000
         )
         t.execute()
@@ -133,8 +130,8 @@ class TestPay(unittest.TestCase):
     def test_pay_single_commissioned(self):
         self.add_sales()
         pay_date = date(2020, 11, 27)  # 2주마다 돌아오는 금요일
-        pc = self.pay_check(pay_date, self.commissioned_employee.emp_id)
         c_dict = self.commissioned_dict
+        pc = self.pay_check(pay_date, c_dict['emp_id'])
         gross_pay = c_dict['salary'] + c_dict['commission_rate'] * 1000  # 1000 매출
         self.check_pc(gross_pay, pay_date, pc)
 
