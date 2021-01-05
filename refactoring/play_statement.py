@@ -1,26 +1,8 @@
-from create_data import create_data
-
-invoices = {
-    "customer": "BigCo",
-    "performances": [
-        {
-            "playID": "hamlet",
-            "audience": 55
-        },
-        {
-            "playID": "as-like",
-            "audience": 35
-        },
-        {
-            "playID": "othello",
-            "audience": 40
-        }
-    ]
-}
+from create_data import Data
 
 
 def statement(invoices):
-    return render_plain_text(create_data(invoices))
+    return render_plain_text(Data(invoices).result())
 
 
 def render_html(data):
@@ -43,26 +25,3 @@ def render_plain_text(data):
     result += "총액: %s\n" % (data['total_amount'] / 100)
     result += "적립 포인트: %s 점" % data['total_volume_credits']
     return result
-
-
-answer = """청구내역 (고객명 : BigCo)
-    Hamlet: 650.0 (55석)
-    As You Like It: 475.0 (35석)
-    Othello: 500.0 (40석)
-총액: 1625.0
-적립 포인트: 47 점"""
-
-passed = True
-
-count = 0
-for a, r in zip(answer.split("\n"), statement(invoices).split("\n")):
-    count += 1
-    if a != r:
-        print("test 실패...")
-        print(a)
-        print(r)
-        passed = False
-    else:
-        print("테스트", count, "PASS")
-if passed:
-    print("!!!초록 막대!!!")

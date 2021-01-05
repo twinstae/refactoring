@@ -1,4 +1,4 @@
-play_data = {
+PLAY_DATA = {
     "hamlet": {"name": "Hamlet", "type": "tragedy"},
     "as-like": {"name": "As You Like It", "type": "comedy"},
     "othello": {"name": "Othello", "type": "tragedy"}
@@ -18,25 +18,29 @@ class PerfCalculator:
 
 class TragedyCalculator(PerfCalculator):
     def amount(self):
-        result = 40000
+        return 40000 + self.surcharge()
+
+    def surcharge(self):
         if self.perf["audience"] > 30:
-            result += 1000 * (self.perf["audience"] - 30)
-        return result
+            return 1000 * (self.perf["audience"] - 30)
+        return 0
 
 
 class ComedyCalculator(PerfCalculator):
     def amount(self):
-        result = 30000
+        return 30000 + self.surcharge()
+
+    def surcharge(self):
         if self.perf["audience"] > 20:
-            result += 10000 + 500 * (self.perf["audience"] - 20)
-        return result
+            return 10000 + 500 * (self.perf["audience"] - 20)
+        return 0
 
     def volume_credit(self):
         return super().volume_credit() + self.perf['audience'] // 5
 
 
 def play_for(perf):
-    return play_data[perf["playID"]]
+    return PLAY_DATA[perf["playID"]]
 
 
 def create_calc(perf):
@@ -47,24 +51,21 @@ def create_calc(perf):
     raise Exception
 
 
-def create_data(invoice):
-    def total_amount():
-        return sum([p['amount'] for p in data['performances']])
+class Data:
+    def __init__(self, invoice):
+        self.result = invoice.copy()
+        for perf in self.result['performances']:  # enrich perf
+            perf['play'] = play_for(perf)
 
-    def total_volume_credits():
-        return sum([p['credit'] for p in data['performances']])
+            calc = create_calc(perf)
+            perf['amount'] = calc.amount()
+            perf['credit'] = calc.volume_credit()
 
-    data = {
-        "customer": invoice["customer"],
-        "performances": invoice["performances"].copy()
-    }
+        self.result["total_amount"] = sum(self.values('amount'))
+        self.result["total_volume_credits"] = sum(self.values('credit'))
 
-    for perf in data['performances']:  # enrich perf
-        calc = create_calc(perf)
-        perf['play'] = play_for(perf)
-        perf['amount'] = calc.amount()
-        perf['credit'] = calc.volume_credit()
+    def result(self):
+        return self.result
 
-    data["total_amount"] = total_amount()
-    data["total_volume_credits"] = total_volume_credits()
-    return data
+    def values(self, key):
+        return [p[key] for p in self.result['performances']]
