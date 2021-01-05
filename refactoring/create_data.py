@@ -30,11 +30,14 @@ class Data:
             perf['amount'] = calc.amount()
             perf['credit'] = calc.volume_credit()
 
-        self.result["total_amount"] = sum(self.values('amount'))
-        self.result["total_volume_credits"] = sum(self.values('credit'))
+        self.result["total_amount"] = self.get_total('amount')
+        self.result["total_volume_credits"] =  self.get_total('credit')
 
     def result(self):
         return self.result
 
     def values(self, key):
         return [p[key] for p in self.result['performances']]
+
+    def get_total(self, key):
+        return sum(self.values(key))
