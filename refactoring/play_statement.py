@@ -2,7 +2,7 @@ from create_data import Data
 
 
 def statement(invoices):
-    return render_plain_text(Data(invoices).result())
+    return render_plain_text(Data(invoices).result)
 
 
 def render_html(data):

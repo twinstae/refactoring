@@ -1,24 +1,27 @@
 import unittest
 from play_statement import statement
-from create_data import Data, PLAY_DATA, play_for
+from create_data import Data, PLAY_DATA, play_for, create_calc, TragedyCalculator, ComedyCalculator
 
 HAMLET = {
             "playID": "hamlet",
             "audience": 55
+        }
+AS_LIKE = {
+            "playID": "as-like",
+            "audience": 35
+        }
+
+OTHELLO = {
+            "playID": "othello",
+            "audience": 40
         }
 
 INVOICES = {
     "customer": "BigCo",
     "performances": [
         HAMLET,
-        {
-            "playID": "as-like",
-            "audience": 35
-        },
-        {
-            "playID": "othello",
-            "audience": 40
-        }
+        AS_LIKE,
+        OTHELLO
     ]
 }
 
@@ -41,13 +44,29 @@ class TestPay(unittest.TestCase):
         print("!!!초록 막대!!!")
 
     def setUp(self) -> None:
-        self.data = Data(INVOICES).result()
+        self.data = Data(INVOICES)
+        self.result = self.data.result
 
     def test_play_for(self):
-        self.assertEqual(PLAY_DATA['hamlet'], play_for(hamlet))
+        self.assertEqual(PLAY_DATA['hamlet'], play_for(HAMLET))
+        self.assertEqual(PLAY_DATA['as-like'], play_for(AS_LIKE))
 
     def test_calc(self):
+        self.assertIsInstance(create_calc(HAMLET), TragedyCalculator)
+        self.assertIsInstance(create_calc(AS_LIKE), ComedyCalculator)
 
-    def test_data(self):
-        self.assertEqual(self.data['total_amount'], 162500)
-        self.assertEqual(self.data['total_volume_credits'], 47)
+    def test_calc_amount(self):
+        hamlet = HAMLET.copy()
+        hamlet_calc = create_calc(hamlet)
+        self.assertEqual(65000, hamlet_calc.amount())
+
+        as_like = AS_LIKE.copy()
+        as_like_calc = create_calc(as_like)
+        self.assertEqual(47500, as_like_calc.amount())
+
+    def test_values_total(self):
+        self.assertEqual(self.data.values('amount'), [65000, 47500, 50000])
+        self.assertEqual(self.data.values('credit'), [25, 12, 10])
+
+        self.assertEqual(self.result['total_amount'], 162500)
+        self.assertEqual(self.result['total_volume_credits'], 47)

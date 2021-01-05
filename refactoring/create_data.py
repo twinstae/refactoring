@@ -44,9 +44,10 @@ def play_for(perf):
 
 
 def create_calc(perf):
-    if play_for(perf)['type'] == 'tragedy':
+    perf_type = play_for(perf)['type']
+    if perf_type == 'tragedy':
         return TragedyCalculator(perf)
-    if play_for(perf)['type'] == 'comedy':
+    if perf_type == 'comedy':
         return ComedyCalculator(perf)
     raise Exception
 
