@@ -31,10 +31,7 @@ class Data:
             perf['credit'] = calc.volume_credit()
 
         self.result["total_amount"] = self.get_total('amount')
-        self.result["total_volume_credits"] =  self.get_total('credit')
-
-    def result(self):
-        return self.result
+        self.result["total_volume_credits"] = self.get_total('credit')
 
     def values(self, key):
         return [p[key] for p in self.result['performances']]
