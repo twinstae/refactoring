@@ -35,13 +35,9 @@ ANSWER = """청구내역 (고객명 : BigCo)
 
 class TestPay(unittest.TestCase):
 
-    def test_result(self):
-        count = 0
-        for a, r in zip(ANSWER.split("\n"), statement(INVOICES).split("\n")):
-            count += 1
-            self.assertEqual(a, r)
-            print("테스트", count, "PASS")
-        print("!!!초록 막대!!!")
+    def test_statement(self):
+        for expected, actual in zip(ANSWER.split("\n"), statement(INVOICES).split("\n")):
+            self.assertEqual(expected, actual)
 
     def setUp(self) -> None:
         self.data = Data(INVOICES)
@@ -56,7 +52,7 @@ class TestPay(unittest.TestCase):
     def test_calc_tragedy(self):
         self.assertIsInstance(create_calc(HAMLET), TragedyCalculator)
 
-    def test_calc_comdey(self):
+    def test_calc_comedy(self):
         self.assertIsInstance(create_calc(AS_LIKE), ComedyCalculator)
 
     def test_calc_amount_tragedy(self):
