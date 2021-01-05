@@ -60,15 +60,19 @@ class TestPay(unittest.TestCase):
         self.assertIsInstance(create_calc(AS_LIKE), ComedyCalculator)
 
     def test_calc_amount_tragedy(self):
-        hamlet = HAMLET.copy()
-        hamlet_calc = create_calc(hamlet)
+        hamlet_calc = create_calc(HAMLET)
         self.assertEqual(65000, hamlet_calc.amount())
+
+    def test_calc_credit_tragedy(self):
+        hamlet_calc = create_calc(HAMLET)
         self.assertEqual(25, hamlet_calc.volume_credit())
 
     def test_calc_amount_comedy(self):
-        as_like = AS_LIKE.copy()
-        as_like_calc = create_calc(as_like)
+        as_like_calc = create_calc(AS_LIKE)
         self.assertEqual(47500, as_like_calc.amount())
+
+    def test_calc_credit_comedy(self):
+        as_like_calc = create_calc(AS_LIKE)
         self.assertEqual(12, as_like_calc.volume_credit())
 
     def test_values_total(self):
