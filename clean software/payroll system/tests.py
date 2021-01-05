@@ -29,7 +29,7 @@ sample_transaction = [
     'ChgEmp 321 Member 1 Dues 0.01',  # 없는 직원은 에러
     'ChgEmp 001 NoMember',
     'ChgEmp 321 NoMember',  # 없는 직원은 에러
-    'Payday 12/20', # 임금을 받는 직원 목록
+    'Payday 12/20',  # 임금을 받는 직원 목록
 ]
 
 
