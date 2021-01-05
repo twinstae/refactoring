@@ -47,26 +47,34 @@ class TestPay(unittest.TestCase):
         self.data = Data(INVOICES)
         self.result = self.data.result
 
-    def test_play_for(self):
+    def test_play_for_tragedy(self):
         self.assertEqual(PLAY_DATA['hamlet'], play_for(HAMLET))
+
+    def test_play_for_comedy(self):
         self.assertEqual(PLAY_DATA['as-like'], play_for(AS_LIKE))
 
-    def test_calc(self):
+    def test_calc_tragedy(self):
         self.assertIsInstance(create_calc(HAMLET), TragedyCalculator)
+
+    def test_calc_comdey(self):
         self.assertIsInstance(create_calc(AS_LIKE), ComedyCalculator)
 
-    def test_calc_amount(self):
+    def test_calc_amount_tragedy(self):
         hamlet = HAMLET.copy()
         hamlet_calc = create_calc(hamlet)
         self.assertEqual(65000, hamlet_calc.amount())
+        self.assertEqual(25, hamlet_calc.volume_credit())
 
+    def test_calc_amount_comedy(self):
         as_like = AS_LIKE.copy()
         as_like_calc = create_calc(as_like)
         self.assertEqual(47500, as_like_calc.amount())
+        self.assertEqual(12, as_like_calc.volume_credit())
 
     def test_values_total(self):
         self.assertEqual(self.data.values('amount'), [65000, 47500, 50000])
-        self.assertEqual(self.data.values('credit'), [25, 12, 10])
-
         self.assertEqual(self.result['total_amount'], 162500)
+
+    def test_credit_total(self):
+        self.assertEqual(self.data.values('credit'), [25, 12, 10])
         self.assertEqual(self.result['total_volume_credits'], 47)
