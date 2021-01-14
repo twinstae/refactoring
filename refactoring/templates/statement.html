@@ -1,0 +1,9 @@
+<h1>청구내역 (고객명 : {{ data.customer }})</h1>
+<table>
+<tr><th>연국</th><th>좌석</th><th>금액</th></tr>
+{% for perf in data.performances %}
+    <tr><th>{{perf.play.name}}</th><th>{{perf.audience}}</th><th>{{perf.amount}}</th></tr>
+{% endfor %}
+</table>
+<p>총액: {{data.total_amount}}</p>
+<p>적립 포인트: {{ data.total_volume_credits }} 점</p>

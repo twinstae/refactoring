@@ -1,5 +1,5 @@
 import unittest
-from play_statement import statement
+from play_statement import statement, statement_html
 from create_data import Data, PLAY_DATA, play_for, create_calc, TragedyCalculator, ComedyCalculator
 
 HAMLET = {
@@ -32,11 +32,28 @@ ANSWER = """청구내역 (고객명 : BigCo)
 총액: 1625.0
 적립 포인트: 47 점"""
 
+ANSWER_HTML = """<h1>청구내역 (고객명 : BigCo)</h1>
+<table>
+<tr><th>연국</th><th>좌석</th><th>금액</th></tr>
+    <tr><th>Hamlet</th><th>55</th><th>65000</th></tr>
+    <tr><th>As You Like It</th><th>35</th><th>47500</th></tr>
+    <tr><th>Othello</th><th>40</th><th>50000</th></tr>
+</table>
+<p>총액: 162500</p>
+<p>적립 포인트: 47 점</p>"""
+
 
 class TestPay(unittest.TestCase):
 
     def test_statement(self):
         for expected, actual in zip(ANSWER.split("\n"), statement(INVOICES).split("\n")):
+            self.assertEqual(expected, actual)
+
+    def test_statement_html(self):
+        for expected, actual in zip(
+                ANSWER_HTML.split("\n"),
+                statement_html(INVOICES).replace("\n\n", "\n").split("\n")
+        ):
             self.assertEqual(expected, actual)
 
     def setUp(self) -> None:
