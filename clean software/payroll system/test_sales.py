@@ -4,13 +4,14 @@ from datetime import date
 from Employee import CommissionedClassification, NoSalesError
 from PayrollDB import PayrollDB as DB, NoEmployeeError
 from SalesReceipt import SalesReceipt
-from Tranaction import SalesReceiptTransaction, AddCommissionedEmployee, AddHourlyEmployee, NotCommissionedError
+from Tranaction import SalesReceiptTransaction, NotCommissionedError, add_commissioned_employee_transaction, \
+    add_hourly_employee_transaction
 
 
 class TestTimeCard(unittest.TestCase):
     def new_employee(self, arg_dict, add_employee):
-        t = add_employee(arg_dict)
-        t.execute()
+        transaction = add_employee(arg_dict)
+        transaction()
         employee = DB.get_employee(arg_dict['emp_id'])
         for attr_name, attr_value in arg_dict.items():
             self.assertTrue(getattr(employee, attr_name) == attr_value)
@@ -26,7 +27,7 @@ class TestTimeCard(unittest.TestCase):
         }
         self.employee = self.new_employee(
             arg_dict=self.arg_dict,
-            add_employee=AddCommissionedEmployee
+            add_employee=add_commissioned_employee_transaction
         )
 
         self.arg_dict2 = {
@@ -37,7 +38,7 @@ class TestTimeCard(unittest.TestCase):
         }
         self.employee2 = self.new_employee(
             arg_dict=self.arg_dict2,
-            add_employee=AddHourlyEmployee
+            add_employee=add_hourly_employee_transaction
         )
 
         self.cc = self.employee.classification

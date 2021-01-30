@@ -5,8 +5,8 @@ from Employee import SalariedClassification, HourlyClassification, CommissionedC
 from PaymentMethod import pay_hold
 from PaymentSchedule import is_weekly_friday, is_monthly_friday, is_biweekly_pay_day
 from PayrollDB import PayrollDB as DB, NoEmployeeError
-from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, DeleteEmployee, NoHourlyError, \
-    NoEmpIdError
+from Tranaction import DeleteEmployee, NoHourlyError, NoEmpIdError, add_hourly_employee_transaction, \
+    add_salaried_employee_transaction, add_commissioned_employee_transaction
 
 
 class TestEmployee(unittest.TestCase):
@@ -18,8 +18,8 @@ class TestEmployee(unittest.TestCase):
             'address': "파주",
             'hourly_rate': 1.0
         }
-        t = AddHourlyEmployee(arg_dict)
-        t.execute()
+        transaction = add_hourly_employee_transaction(arg_dict)
+        transaction()
         employee = self.validate_get_employee(arg_dict)
 
         self.classification_schedule_method(
@@ -31,8 +31,8 @@ class TestEmployee(unittest.TestCase):
 
     def raise_assert(self, e):
         with self.assertRaises(e):
-            t = AddHourlyEmployee(self.arg_dict)
-            t.execute()
+            transaction = add_hourly_employee_transaction(self.arg_dict)
+            transaction()
 
     def test_add_wrong_hourly_employee(self):
         self.arg_dict = {
@@ -77,8 +77,8 @@ class TestEmployee(unittest.TestCase):
             'address': "파주",
             'salary': 1000.0,
         }
-        t = AddSalariedEmployee(arg_dict)
-        t.execute()
+        transaction = add_salaried_employee_transaction(arg_dict)
+        transaction()
         employee = self.validate_get_employee(arg_dict)
 
         self.classification_schedule_method(
@@ -96,8 +96,8 @@ class TestEmployee(unittest.TestCase):
             'salary': 1000.0,
             'commission_rate': 0.1
         }
-        t = AddCommissionedEmployee(arg_dict)
-        t.execute()
+        transaction = add_commissioned_employee_transaction(arg_dict)
+        transaction()
         employee = self.validate_get_employee(arg_dict)
 
         self.classification_schedule_method(
@@ -115,8 +115,8 @@ class TestEmployee(unittest.TestCase):
             'salary': 1000.0,
             'commission_rate': 0.1
         }
-        t = AddCommissionedEmployee(arg_dict)
-        t.execute()
+        transaction = add_commissioned_employee_transaction(arg_dict)
+        transaction()
         employee = self.validate_get_employee(arg_dict)
 
         self.assertEqual(

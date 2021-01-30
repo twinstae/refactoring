@@ -5,8 +5,8 @@ from datetime import date
 from PayDayTransaction import PayDayTransaction
 from PaymentSchedule import is_monthly_friday
 from PayrollDB import PayrollDB as DB
-from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, TimeCardTransaction, \
-    SalesReceiptTransaction
+from Tranaction import TimeCardTransaction, SalesReceiptTransaction, add_salaried_employee_transaction, \
+    add_hourly_employee_transaction, add_commissioned_employee_transaction
 
 
 class TestPay(unittest.TestCase):
@@ -31,8 +31,8 @@ class TestPay(unittest.TestCase):
             'address': "파주",
             'salary': 1000.0,
         }
-        t = AddSalariedEmployee(self.salaried_dict)
-        t.execute()
+        transaction = add_salaried_employee_transaction(self.salaried_dict)
+        transaction()
         self.salaried_employee = self.validate_get_employee(self.salaried_dict)
 
         self.hourly_dict = {
@@ -41,8 +41,8 @@ class TestPay(unittest.TestCase):
             'address': "파주",
             'hourly_rate': 10.0
         }
-        t2 = AddHourlyEmployee(self.hourly_dict)
-        t2.execute()
+        transaction2 = add_hourly_employee_transaction(self.hourly_dict)
+        transaction2()
 
         self.commissioned_dict = {
             'emp_id': 3,
@@ -51,8 +51,8 @@ class TestPay(unittest.TestCase):
             'salary': 1000.0,
             'commission_rate': 0.1
         }
-        t3 = AddCommissionedEmployee(self.commissioned_dict)
-        t3.execute()
+        transaction3 = add_commissioned_employee_transaction(self.commissioned_dict)
+        transaction3()
 
     def tearDown(self) -> None:
         DB.clear()

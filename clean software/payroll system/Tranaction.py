@@ -1,4 +1,4 @@
-from Employee import Employee, PaymentClassification, SalariedClassification, HourlyClassification, \
+from Employee import Employee, SalariedClassification, HourlyClassification, \
     CommissionedClassification
 from abc import *
 
@@ -15,36 +15,21 @@ class Transaction(metaclass=ABCMeta):
         pass
 
 
-class AddEmployeeTransaction(Transaction):
-    def __init__(self, arg_dict):
-        self.args = arg_dict
-
-    def execute(self):
-        if 'emp_id' not in self.args:
+def add_employee_transaction(arg_dict, classification, schedule):
+    def execute():
+        if 'emp_id' not in arg_dict:
             raise NoEmpIdError
 
-        e = self.get_employee()
-        DB.add_employee(self.args['emp_id'], e)
-        return e
-
-    def get_employee(self):
-        cls = self.get_classification()
-
         e = Employee(
-            arg_dict=self.args,
-            classification=cls,
-            schedule=self.get_schedule(),
+            arg_dict=arg_dict,
+            classification=classification,
+            schedule=schedule,
             method=pay_hold
         )
+        DB.add_employee(e.emp_id, e)
         return e
 
-    @staticmethod
-    def get_classification():
-        pass
-
-    @staticmethod
-    def get_schedule():
-        pass
+    return execute
 
 
 class NoEmpIdError(Exception):
@@ -52,15 +37,15 @@ class NoEmpIdError(Exception):
         return "arg에 emp_id가 없습니다"
 
 
-class AddHourlyEmployee(AddEmployeeTransaction):
-    def get_classification(self):
-        if 'hourly_rate' not in self.args:
-            raise NoHourlyError
-        return HourlyClassification(self.args['hourly_rate'])
+def add_hourly_employee_transaction(arg_dict):
+    if 'hourly_rate' not in arg_dict:
+        raise NoHourlyError
 
-    @staticmethod
-    def get_schedule():
-        return is_weekly_friday
+    return add_employee_transaction(
+        arg_dict,
+        classification=HourlyClassification(arg_dict['hourly_rate']),
+        schedule=is_weekly_friday
+    )
 
 
 class NoHourlyError(Exception):
@@ -68,14 +53,15 @@ class NoHourlyError(Exception):
         return "arg에 hourly_rate가 없습니다"
 
 
-class AddSalariedEmployee(AddEmployeeTransaction):
-    def get_classification(self):
-        if 'salary' not in self.args:
-            raise NoSalaryError
-        return SalariedClassification(self.args['salary'])
+def add_salaried_employee_transaction(arg_dict):
+    if 'salary' not in arg_dict:
+        raise NoSalaryError
 
-    def get_schedule(self):
-        return is_monthly_friday
+    return add_employee_transaction(
+        arg_dict,
+        classification=SalariedClassification(arg_dict['salary']),
+        schedule=is_monthly_friday
+    )
 
 
 class NoSalaryError(Exception):
@@ -83,22 +69,21 @@ class NoSalaryError(Exception):
         return "arg에 salary가 없습니다"
 
 
-class AddCommissionedEmployee(AddEmployeeTransaction):
-    def get_classification(self):
+def add_commissioned_employee_transaction(arg_dict):
+    if 'salary' not in arg_dict:
+        raise NoSalaryError
 
-        if 'salary' not in self.args:
-            raise NoSalaryError
+    if 'commission_rate' not in arg_dict:
+        raise NoCommissionError
 
-        if 'commission_rate' not in self.args:
-            raise NoCommissionError
-
-        return CommissionedClassification(
-            salary=self.args['salary'],
-            commission_rate=self.args['commission_rate']
-        )
-
-    def get_schedule(self):
-        return is_biweekly_pay_day
+    return add_employee_transaction(
+        arg_dict,
+        classification=CommissionedClassification(
+            salary=arg_dict['salary'],
+            commission_rate=arg_dict['commission_rate']
+        ),
+        schedule=is_biweekly_pay_day
+    )
 
 
 class NoCommissionError(Exception):

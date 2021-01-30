@@ -46,8 +46,9 @@ class ChangeClassificationTransaction(ChangeEmployeeTransaction):
     def get_classification(self):
         pass
 
-    def get_shedule(self):
+    def get_schedule(self):
         pass
+
 
 class ChangeHourlyTransaction(ChangeClassificationTransaction):
     def __init__(self, emp_id, hourly_rate):

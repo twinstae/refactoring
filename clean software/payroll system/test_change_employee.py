@@ -4,8 +4,9 @@ from ChangeEmployeeTransaction import ChangeNameTransaction, ChangeAddressTransa
     ChangeHourlyTransaction, ChangeCommissionedTransaction
 from Employee import HourlyClassification, SalariedClassification, CommissionedClassification
 from PayrollDB import PayrollDB as DB, NoEmployeeError
-from Tranaction import AddHourlyEmployee, AddCommissionedEmployee
 from PaymentSchedule import is_weekly_friday, is_biweekly_pay_day, is_monthly_friday
+from Tranaction import add_hourly_employee_transaction, add_commissioned_employee_transaction
+
 
 class TestChangeEmployee(unittest.TestCase):
 
@@ -16,8 +17,8 @@ class TestChangeEmployee(unittest.TestCase):
             'address': "파주",
             'hourly_rate': 1.0
         }
-        t = AddHourlyEmployee(arg_dict)
-        t.execute()
+        transaction = add_hourly_employee_transaction(arg_dict)
+        transaction()
         self.hourly_id = arg_dict['emp_id']
 
         arg_dict2 = {
@@ -27,8 +28,8 @@ class TestChangeEmployee(unittest.TestCase):
             'salary': 1000.0,
             'commission_rate': 0.1
         }
-        t2 = AddCommissionedEmployee(arg_dict2)
-        t2.execute()
+        transaction_2 = add_commissioned_employee_transaction(arg_dict2)
+        transaction_2()
         self.commission_id = arg_dict2['emp_id']
 
     def tearDown(self) -> None:
