@@ -4,7 +4,7 @@ from datetime import date
 from Employee import HourlyClassification, NoTimeCardError
 from PayrollDB import PayrollDB as DB, NoEmployeeError
 from TimeCard import TimeCard
-from Tranaction import TimeCardTransaction, add_hourly_employee_transaction
+from Tranaction import add_hourly_employee_transaction, add_time_card_transaction
 
 
 class TestTimeCard(unittest.TestCase):
@@ -35,12 +35,12 @@ class TestTimeCard(unittest.TestCase):
         DB.clear()
 
     def test_add_and_get_time_card(self):
-        t = TimeCardTransaction(
+        transaction = add_time_card_transaction(
             emp_id=self.arg_dict['emp_id'],
             date=date(2001, 10, 31),
             hours=8.0
         )
-        t.execute()
+        transaction()
 
         tc = self.hc.get_time_card(date(2001, 10, 31))
         self.assertIsInstance(tc, TimeCard)
@@ -48,12 +48,12 @@ class TestTimeCard(unittest.TestCase):
 
     def test_add_and_get_wrong_time_card(self):
         with self.assertRaises(NoEmployeeError):
-            t = TimeCardTransaction(
+            transaction = add_time_card_transaction(
                 emp_id=987,
                 date=date(2001, 10, 31),
                 hours=8.0
             )
-            t.execute()
+            transaction()
 
         with self.assertRaises(NoTimeCardError):
             tc = self.hc.get_time_card(date(9999, 10, 31))

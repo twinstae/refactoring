@@ -91,34 +91,28 @@ class NoCommissionError(Exception):
         return "arg에 commission_rate가 없습니다"
 
 
-class DeleteEmployee(Transaction):
-    def __init__(self, emp_id):
-        self.emp_id = emp_id
-
-    def execute(self):
-        DB.delete_employee(self.emp_id)
+def delete_employee_transaction(emp_id):
+    def execute():
+        DB.delete_employee(emp_id)
+    return execute
 
 
-class TimeCardTransaction(Transaction):
-    def __init__(self, emp_id, date, hours):
-        self.emp_id = emp_id
-        self.date = date
-        self.hours = hours
-
-    def execute(self):
-        employee = DB.get_employee(self.emp_id)
+def add_time_card_transaction(emp_id, date, hours):
+    def execute():
+        employee = DB.get_employee(emp_id)
 
         hc = employee.classification
         if isinstance(hc, HourlyClassification):
 
             time_card = TimeCard(
-                date=self.date,
-                hours=self.hours
+                date=date,
+                hours=hours
             )
 
             hc.add_time_card(time_card)
         else:
             raise NotHourlyError
+    return execute
 
 
 class NotHourlyError(Exception):
@@ -126,25 +120,21 @@ class NotHourlyError(Exception):
         return "hourly employee가 아닙니다."
 
 
-class SalesReceiptTransaction(Transaction):
-    def __init__(self, emp_id, date, amount):
-        self.emp_id = emp_id
-        self.date = date
-        self.amount = amount
-
-    def execute(self):
-        employee = DB.get_employee(self.emp_id)
+def add_sales_receipt_transaction(emp_id, date, amount):
+    def execute():
+        employee = DB.get_employee(emp_id)
 
         cc = employee.classification
         if isinstance(cc, CommissionedClassification):
             cc.add_sales(
                 sales=SalesReceipt(
-                    date=self.date,
-                    amount=self.amount
+                    date=date,
+                    amount=amount
                 )
             )
         else:
             raise NotCommissionedError
+    return execute
 
 
 class NotCommissionedError(Exception):

@@ -4,8 +4,8 @@ from datetime import date
 from Employee import CommissionedClassification, NoSalesError
 from PayrollDB import PayrollDB as DB, NoEmployeeError
 from SalesReceipt import SalesReceipt
-from Tranaction import SalesReceiptTransaction, NotCommissionedError, add_commissioned_employee_transaction, \
-    add_hourly_employee_transaction
+from Tranaction import NotCommissionedError, add_commissioned_employee_transaction, \
+    add_hourly_employee_transaction, add_sales_receipt_transaction
 
 
 class TestTimeCard(unittest.TestCase):
@@ -48,12 +48,12 @@ class TestTimeCard(unittest.TestCase):
         DB.clear()
 
     def test_transaction(self):
-        t = SalesReceiptTransaction(
+        transaction = add_sales_receipt_transaction(
             emp_id=self.arg_dict['emp_id'],
             date=date(2001, 10, 31),
             amount=8.0
         )
-        t.execute()
+        transaction()
 
         sr = self.cc.get_sales(date(2001, 10, 31))
         self.assertIsInstance(sr, SalesReceipt)
@@ -61,21 +61,21 @@ class TestTimeCard(unittest.TestCase):
 
     def test_wrong_id(self):
         with self.assertRaises(NoEmployeeError):
-            t = SalesReceiptTransaction(
+            transaction = add_sales_receipt_transaction(
                 emp_id=987,
                 date=date(2001, 10, 31),
                 amount=8.0
             )
-            t.execute()
+            transaction()
 
     def test_wrong_employee(self):
         with self.assertRaises(NotCommissionedError):
-            t = SalesReceiptTransaction(
+            transaction = add_sales_receipt_transaction(
                 emp_id=2,
                 date=date(2001, 10, 31),
                 amount=8.0
             )
-            t.execute()
+            transaction()
 
     def test_get_wrong_date(self):
         with self.assertRaises(NoSalesError):

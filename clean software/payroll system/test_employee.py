@@ -5,8 +5,8 @@ from Employee import SalariedClassification, HourlyClassification, CommissionedC
 from PaymentMethod import pay_hold
 from PaymentSchedule import is_weekly_friday, is_monthly_friday, is_biweekly_pay_day
 from PayrollDB import PayrollDB as DB, NoEmployeeError
-from Tranaction import DeleteEmployee, NoHourlyError, NoEmpIdError, add_hourly_employee_transaction, \
-    add_salaried_employee_transaction, add_commissioned_employee_transaction
+from Tranaction import NoHourlyError, NoEmpIdError, add_hourly_employee_transaction, \
+    add_salaried_employee_transaction, add_commissioned_employee_transaction, delete_employee_transaction
 
 
 class TestEmployee(unittest.TestCase):
@@ -123,8 +123,8 @@ class TestEmployee(unittest.TestCase):
             DB.get_employee(arg_dict['emp_id']), employee
         )
 
-        t = DeleteEmployee(arg_dict['emp_id'])
-        t.execute()
+        transaction2 = delete_employee_transaction(arg_dict['emp_id'])
+        transaction2()
 
         with self.assertRaises(NoEmployeeError):
             DB.get_employee(arg_dict['emp_id'])

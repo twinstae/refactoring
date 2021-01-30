@@ -5,8 +5,9 @@ from datetime import date
 from PayDayTransaction import PayDayTransaction
 from PaymentSchedule import is_monthly_friday
 from PayrollDB import PayrollDB as DB
-from Tranaction import TimeCardTransaction, SalesReceiptTransaction, add_salaried_employee_transaction, \
-    add_hourly_employee_transaction, add_commissioned_employee_transaction
+from Tranaction import add_salaried_employee_transaction, \
+    add_hourly_employee_transaction, add_commissioned_employee_transaction, add_time_card_transaction, \
+    add_sales_receipt_transaction
 
 
 class TestPay(unittest.TestCase):
@@ -87,12 +88,12 @@ class TestPay(unittest.TestCase):
         self.assertIsNone(pc)
 
     def add_time_card(self):
-        tc = TimeCardTransaction(
+        transaction = add_time_card_transaction(
             emp_id=self.hourly_dict['emp_id'],
             date=date(2020, 11, 21),
             hours=10.0
         )
-        tc.execute()
+        transaction()
 
     def pay_hourly(self, pay_date, hours):
         self.add_time_card()
@@ -119,12 +120,12 @@ class TestPay(unittest.TestCase):
         )
 
     def add_sales(self):
-        t = SalesReceiptTransaction(
+        transaction = add_sales_receipt_transaction(
             emp_id=self.commissioned_dict['emp_id'],
             date=date(2020, 11, 14),  # 경계값
             amount=1000
         )
-        t.execute()
+        transaction()
 
     def test_pay_single_commissioned(self):
         self.add_sales()
