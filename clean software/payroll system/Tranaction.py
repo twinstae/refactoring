@@ -1,18 +1,11 @@
 from Employee import Employee, SalariedClassification, HourlyClassification, \
     CommissionedClassification
-from abc import *
 
 from PaymentMethod import pay_hold
 from PaymentSchedule import is_weekly_friday, is_monthly_friday, is_biweekly_pay_day
 from PayrollDB import PayrollDB as DB
 from SalesReceipt import SalesReceipt
 from TimeCard import TimeCard
-
-
-class Transaction(metaclass=ABCMeta):
-    @abstractmethod
-    def execute(self):
-        pass
 
 
 def add_employee_transaction(arg_dict, classification, schedule):

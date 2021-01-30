@@ -1,7 +1,7 @@
 import unittest
 
-from ChangeEmployeeTransaction import ChangeNameTransaction, ChangeAddressTransaction, ChangeSalariedTransaction, \
-    ChangeHourlyTransaction, ChangeCommissionedTransaction
+from ChangeEmployeeTransaction import change_address_transaction, change_commissioned_transaction, \
+    change_hourly_transaction, change_name_transaction, change_salaried_transaction
 from Employee import HourlyClassification, SalariedClassification, CommissionedClassification
 from PayrollDB import PayrollDB as DB, NoEmployeeError
 from PaymentSchedule import is_weekly_friday, is_biweekly_pay_day, is_monthly_friday
@@ -43,64 +43,67 @@ class TestChangeEmployee(unittest.TestCase):
 
     def test_change_name(self):
         new_name = "Bob"
-        t = ChangeNameTransaction(
+        transaction = change_name_transaction(
             emp_id=self.hourly_id,
             new_name=new_name
         )
-        t.execute()
+        transaction()
         new_employee = DB.get_employee(emp_id=self.hourly_id)
         self.assertEqual(new_employee.name, new_name)
 
     def test_change_address(self):
         new_address = "서울"
-        t = ChangeAddressTransaction(
+        transaction = change_address_transaction(
             emp_id=self.hourly_id,
             new_address=new_address
         )
-        t.execute()
+        transaction()
         new_employee = DB.get_employee(emp_id=self.hourly_id)
         self.assertEqual(new_employee.address, new_address)
 
     def test_change_wrong_employee(self):
         new_value = "의미 없는 값"
         transaction_list = [
-            ChangeAddressTransaction,
-            ChangeNameTransaction,
-            ChangeSalariedTransaction,
-            ChangeHourlyTransaction
+            change_address_transaction,
+            change_name_transaction,
+            change_salaried_transaction,
+            change_hourly_transaction
         ]
-        for transaction in transaction_list:
+        for transaction_func in transaction_list:
             with self.assertRaises(NoEmployeeError):
-                t = transaction(987, new_value)
-                t.execute()
+                transaction = transaction_func(987, new_value)
+                transaction()
 
     def test_change_hourly(self):
-        t = ChangeHourlyTransaction(self.commission_id, 10)
+        transaction = change_hourly_transaction(self.commission_id, 10)
         self.change_cls(
-            t,
+            self.hourly_id,
+            transaction,
             HourlyClassification,
             is_weekly_friday
         )
 
     def test_change_salaried(self):
-        t = ChangeSalariedTransaction(self.hourly_id, 1000)
+        transaction = change_salaried_transaction(self.hourly_id, 1000)
         self.change_cls(
-            t,
+            self.hourly_id,
+            transaction,
             SalariedClassification,
             is_monthly_friday
         )
 
     def test_change_commissioned(self):
-        t = ChangeCommissionedTransaction(self.hourly_id, 1000, 0.1)
+        transaction = change_commissioned_transaction(self.hourly_id, 1000, 0.1)
         self.change_cls(
-            t,
+            self.hourly_id,
+            transaction,
             CommissionedClassification,
             is_biweekly_pay_day
         )
 
-    def change_cls(self, t, cls, schedule_cls):
-        t.execute()
-        new_employee = DB.get_employee(emp_id=t.emp_id)
+    def change_cls(self, emp_id, transaction, cls, schedule_cls):
+        transaction()
+        new_employee = DB.get_employee(emp_id=emp_id)
         self.assertIsInstance(new_employee.classification, cls)
         self.assertEqual(new_employee.schedule, schedule_cls)
 

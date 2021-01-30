@@ -2,7 +2,7 @@ import unittest
 
 from datetime import date
 
-from PayDayTransaction import PayDayTransaction
+from PayDayTransaction import pay_day_transaction
 from PaymentSchedule import is_monthly_friday
 from PayrollDB import PayrollDB as DB
 from Tranaction import add_salaried_employee_transaction, \
@@ -137,10 +137,9 @@ class TestPay(unittest.TestCase):
 
     @staticmethod
     def pay_check(pay_date, emp_id):
-        t = PayDayTransaction(pay_date)
-        t.execute()
-        pc = t.get_pay_check(emp_id)
-        return pc
+        transaction = pay_day_transaction(pay_date)
+        pay_check = transaction()
+        return pay_check.get(emp_id, None)
 
     def check_pc(self, gross_pay, pay_date, pc):
         self.assertIsNotNone(pc)
