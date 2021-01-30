@@ -2,8 +2,8 @@ from Employee import Employee, PaymentClassification, SalariedClassification, Ho
     CommissionedClassification
 from abc import *
 
-from PaymentMethod import HoldMethod
-from PaymentSchedule import PaymentSchedule, MonthlySchedule, WeeklySchedule, BiweeklySchedule
+from PaymentMethod import pay_hold
+from PaymentSchedule import is_weekly_friday, is_monthly_friday, is_biweekly_pay_day
 from PayrollDB import PayrollDB as DB
 from SalesReceipt import SalesReceipt
 from TimeCard import TimeCard
@@ -34,7 +34,7 @@ class AddEmployeeTransaction(Transaction):
             arg_dict=self.args,
             classification=cls,
             schedule=self.get_schedule(),
-            method=HoldMethod()
+            method=pay_hold
         )
         return e
 
@@ -60,7 +60,7 @@ class AddHourlyEmployee(AddEmployeeTransaction):
 
     @staticmethod
     def get_schedule():
-        return WeeklySchedule()
+        return is_weekly_friday
 
 
 class NoHourlyError(Exception):
@@ -75,7 +75,7 @@ class AddSalariedEmployee(AddEmployeeTransaction):
         return SalariedClassification(self.args['salary'])
 
     def get_schedule(self):
-        return MonthlySchedule()
+        return is_monthly_friday
 
 
 class NoSalaryError(Exception):
@@ -98,7 +98,7 @@ class AddCommissionedEmployee(AddEmployeeTransaction):
         )
 
     def get_schedule(self):
-        return BiweeklySchedule()
+        return is_biweekly_pay_day
 
 
 class NoCommissionError(Exception):

@@ -11,7 +11,7 @@ class Employee:
             setattr(self, attr_name, value)
         self.classification = classification
         self.schedule = schedule
-        self.method = method
+        self.pay_method = method
         self.affiliation = None  # null object
 
         if not self.name:
@@ -23,13 +23,13 @@ class Employee:
         self.affiliation = affiliation
 
     def is_pay_day(self, date):
-        return self.schedule.is_pay_day(date)
+        return self.schedule(date)
 
     def pay_day(self, pc):
         pc.gross_pay = self.classification.calculate_pay(pc)
         pc.deduction = 0  # self.affiliation.calculate_deduction(pc)
         pc.net_pay = pc.gross_pay - pc.deduction
-        self.method.pay(pc)
+        self.pay_method(pc)
 
 
 class NoNameError(Exception):

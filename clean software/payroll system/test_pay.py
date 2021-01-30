@@ -3,7 +3,7 @@ import unittest
 from datetime import date
 
 from PayDayTransaction import PayDayTransaction
-from PaymentSchedule import MonthlySchedule
+from PaymentSchedule import is_monthly_friday
 from PayrollDB import PayrollDB as DB
 from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, TimeCardTransaction, \
     SalesReceiptTransaction
@@ -59,8 +59,7 @@ class TestPay(unittest.TestCase):
 
     def test_monthly_schedule(self):
         pay_date = date(2001, 11, 30)
-        ms = MonthlySchedule()
-        self.assertTrue(ms.is_pay_day(pay_date))
+        self.assertTrue(is_monthly_friday(pay_date))
 
     def test_get_weekly_employees_with_pay_day(self):
         pay_date = date(2020, 11, 20)

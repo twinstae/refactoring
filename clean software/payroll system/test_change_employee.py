@@ -3,10 +3,9 @@ import unittest
 from ChangeEmployeeTransaction import ChangeNameTransaction, ChangeAddressTransaction, ChangeSalariedTransaction, \
     ChangeHourlyTransaction, ChangeCommissionedTransaction
 from Employee import HourlyClassification, SalariedClassification, CommissionedClassification
-from PaymentSchedule import BiweeklySchedule, MonthlySchedule, WeeklySchedule
 from PayrollDB import PayrollDB as DB, NoEmployeeError
 from Tranaction import AddHourlyEmployee, AddCommissionedEmployee
-
+from PaymentSchedule import is_weekly_friday, is_biweekly_pay_day, is_monthly_friday
 
 class TestChangeEmployee(unittest.TestCase):
 
@@ -79,7 +78,7 @@ class TestChangeEmployee(unittest.TestCase):
         self.change_cls(
             t,
             HourlyClassification,
-            WeeklySchedule
+            is_weekly_friday
         )
 
     def test_change_salaried(self):
@@ -87,7 +86,7 @@ class TestChangeEmployee(unittest.TestCase):
         self.change_cls(
             t,
             SalariedClassification,
-            MonthlySchedule
+            is_monthly_friday
         )
 
     def test_change_commissioned(self):
@@ -95,14 +94,14 @@ class TestChangeEmployee(unittest.TestCase):
         self.change_cls(
             t,
             CommissionedClassification,
-            BiweeklySchedule
+            is_biweekly_pay_day
         )
 
     def change_cls(self, t, cls, schedule_cls):
         t.execute()
         new_employee = DB.get_employee(emp_id=t.emp_id)
         self.assertIsInstance(new_employee.classification, cls)
-        self.assertIsInstance(new_employee.schedule, schedule_cls)
+        self.assertEqual(new_employee.schedule, schedule_cls)
 
 
 if __name__ == '__main__':

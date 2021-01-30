@@ -1,25 +1,10 @@
-from abc import *
+def pay_hold(pc):
+    pc.disposition = "Hold"
 
 
-class PaymentMethod(metaclass=ABCMeta):
-    @staticmethod
-    def pay(pc):
-        pass
+def pay_direct(pc):
+    pass
 
 
-class HoldMethod(PaymentMethod):
-    @staticmethod
-    def pay(pc):
-        pc.disposition = "Hold"
-
-
-class DirectMethod(PaymentMethod):
-    @staticmethod
-    def pay(pc):
-        pass
-
-
-class MailMethod(PaymentMethod):
-    @staticmethod
-    def pay(pc):
-        pass
+def pay_mail(pc):
+    pass

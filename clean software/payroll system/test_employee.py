@@ -2,8 +2,8 @@ import unittest
 
 from Employee import SalariedClassification, HourlyClassification, CommissionedClassification, NoNameError, \
     NoAddressError
-from PaymentMethod import HoldMethod
-from PaymentSchedule import MonthlySchedule, WeeklySchedule, BiweeklySchedule
+from PaymentMethod import pay_hold
+from PaymentSchedule import is_weekly_friday, is_monthly_friday, is_biweekly_pay_day
 from PayrollDB import PayrollDB as DB, NoEmployeeError
 from Tranaction import AddSalariedEmployee, AddHourlyEmployee, AddCommissionedEmployee, DeleteEmployee, NoHourlyError, \
     NoEmpIdError
@@ -25,8 +25,8 @@ class TestEmployee(unittest.TestCase):
         self.classification_schedule_method(
             employee,
             classification=HourlyClassification,
-            schedule=WeeklySchedule,
-            method=HoldMethod
+            schedule=is_weekly_friday,
+            pay_method=pay_hold
         )
 
     def raise_assert(self, e):
@@ -84,8 +84,8 @@ class TestEmployee(unittest.TestCase):
         self.classification_schedule_method(
             employee,
             classification=SalariedClassification,
-            schedule=MonthlySchedule,
-            method=HoldMethod
+            schedule=is_monthly_friday,
+            pay_method=pay_hold
         )
 
     def test_commissioned_employee(self):
@@ -103,8 +103,8 @@ class TestEmployee(unittest.TestCase):
         self.classification_schedule_method(
             employee,
             classification=CommissionedClassification,
-            schedule=BiweeklySchedule,
-            method=HoldMethod
+            schedule=is_biweekly_pay_day,
+            pay_method=pay_hold
         )
 
     def test_delete_employee(self):
@@ -135,15 +135,15 @@ class TestEmployee(unittest.TestCase):
             self.assertTrue(getattr(employee, attr_name) == attr_value)
         return employee
 
-    def classification_schedule_method(self, employee, classification, schedule, method):
+    def classification_schedule_method(self, employee, classification, schedule, pay_method):
         pc = employee.classification
         self.assertIsInstance(pc, classification)
 
         ps = employee.schedule
-        self.assertIsInstance(ps, schedule)
+        self.assertEqual(ps, schedule)
 
-        pm = employee.method
-        self.assertIsInstance(pm, method)
+        pm = employee.pay_method
+        self.assertEqual(pm, pay_method)
 
 
 if __name__ == '__main__':

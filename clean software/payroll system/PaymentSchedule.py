@@ -1,34 +1,15 @@
-from abc import *
 import calendar
-from datetime import date, timedelta
+from datetime import date
 
 
-class PaymentSchedule(metaclass=ABCMeta):
-    pass
+def is_monthly_friday(target_date: date):
+    return target_date.day == calendar.monthrange(target_date.year, target_date.month)[1]
 
 
-class MonthlySchedule(PaymentSchedule):
-    @staticmethod
-    def is_pay_day(pay_date: date):
-        return pay_date.day == calendar.monthrange(pay_date.year, pay_date.month)[1]
+def is_weekly_friday(target_date: date):
+    return target_date.weekday() == 4
 
 
-def is_friday(pay_date):
-    return pay_date.weekday() == 4
-
-
-class WeeklySchedule(PaymentSchedule):
-    @staticmethod
-    def is_pay_day(pay_date: date):
-        return is_friday(pay_date)
-
-
-def is_biweek(target):
+def is_biweekly_pay_day(target_date: date):
     first_day = date(2000, 1, 1)
-    return (target - first_day).days % 14 == 6
-
-
-class BiweeklySchedule(PaymentSchedule):
-    @staticmethod
-    def is_pay_day(pay_date: date):
-        return is_biweek(pay_date)
+    return (target_date - first_day).days % 14 == 6
