@@ -19,7 +19,7 @@ describe('basic types', () => {
         let colorName: string = Color[2];
         expect(colorName).toBe('Green');
     })
-    test('Enum count', () => {
+    test('Enum counter', () => {
         enum Color {
             red,
             green,
@@ -27,29 +27,35 @@ describe('basic types', () => {
         }
 
         const colorList: Color[] = [
-            Color.red, Color.green, Color.blue,
+            Color.red, Color.blue,
             Color.red, Color.blue, Color.red
         ];
-
         
-        const colorKeys: string[] = Object.keys(Color)
-            .filter(key=>isNaN(parseInt(key)));
+        function keysOfEnum(enumObj: object): string[] {
+            return Object.keys(enumObj)
+                .filter(key=>isNaN(parseInt(key)));
+        }
             
         function count<T>(list: T[] , expected: T): number {
             return list.filter(v=>v==expected).length
         };
+
+        type EnumCounter = { [key: string]: number};
+
+        function enumCounter<T>(
+            enumObj: object, enumList: T[]
+        ): EnumCounter{
+            const initial: EnumCounter = {};
+            return keysOfEnum(enumObj).reduce((result, color)=>({
+                ...result,
+                [color]: count(enumList, enumObj[color])
+            }), initial);
+        }
         
-        const initial: { [key: string]: number} = {};
-
-        const colorsCount = colorKeys.reduce((result, color)=>({
-            ...result,
-            [color]: count(colorList, Color[color])
-        }), initial);
-
-        console.log(Color);
+        const colorsCount = enumCounter(Color, colorList);
         console.log(colorsCount);
         expect(colorsCount.red).toBe(3);
-        expect(colorsCount.green).toBe(1);
+        expect(colorsCount.green).toBe(0);
         expect(colorsCount.blue).toBe(2);
     })
 })
