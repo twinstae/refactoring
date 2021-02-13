@@ -116,6 +116,20 @@ object List {
     case (Cons(headA, tailA), Cons(headB, tailB)) => Cons(f(headA, headB), zipWith(tailA, tailB)(f))
   }
 
+  @tailrec
+  def startsWith[A](list: List[A], prefix: List[A]): Boolean = (list, prefix) match {
+    case (_, Nil) => true // 더 이상 비교할 prefix가 남지 않았다...
+    case (Cons(lh,lt), Cons(hp, tp)) if lh == hp => startsWith(lt, tp) // 같으면 다음 값을 비교
+    case _ => false // prefix의 head와 같지 않다
+  }
+
+  @tailrec
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = sup match {
+    case Nil => sub == Nil
+    case _ if startsWith(sup, sub) => true
+    case Cons(_, t) => hasSubsequence(t, sub)
+  }
+
   def main(args: Array[String]): Unit ={
     // 패턴 부합
     val x = List(1,2,3,4,5) match {
@@ -187,5 +201,7 @@ object List {
     // 3.23
     println(zipWith(List(1,2,3), List(4,5,6))(_*_)
       == List(4,10,18))
+    // 3.24
+    println(hasSubsequence(List(1, 2, 3, 4, 5, 6), List(4, 5)))
   }
 }
