@@ -1,6 +1,6 @@
 import scala.annotation.tailrec
 
-object Hello {
+object Chapter2 {
   def abs(n: Int): Int =
     if (n < 0) -n
     else n
@@ -23,6 +23,7 @@ object Hello {
     "The factorial of %d is %d".format(x, factorial(x))
 
   def fib(n: Int): Int = {
+    @tailrec
     def go(now: Int, a: Int, b: Int): Int =
       if (n == now) a
       else go(now+1, b, a+b)
@@ -33,6 +34,26 @@ object Hello {
   private def formatFib(x: Int): String =
     "The %dth fibonacci number is %d".format(x, fib(x))
 
+  def findFirst[T](as: Array[T], p: T => Boolean): Int = {
+    @tailrec
+    def loop(n: Int): Int =
+      if (n >= as.length) -1
+      else if (p(as(n))) n
+      else loop(n+1)
+    loop(0)
+  }
+
+  def isSorted[A](as: Array[A], ordered: (A,A)=> Boolean): Boolean = {
+    @tailrec
+    def loop(n: Int): Boolean = {
+      if (n >= as.length) true
+      else if (ordered(as(n-1), as(n))) loop(n+1)
+      else false
+    }
+
+    loop(1)
+  }
+
   def main(args: Array[String]): Unit ={
     println(formatAbs(-42))
     println()
@@ -42,5 +63,13 @@ object Hello {
     println(formatFib(4))
     println(formatFib(5))
     println(formatFib(6))
+
+    println()
+    val firstIntArray = Array(1,2,3,4,5)
+    println(findFirst[Int](firstIntArray, (a: Int) => a==3))
+    println(isSorted[Int](firstIntArray, (a,b)=> a < b))
+    val secondIntArray = Array(1,2,3,10,1)
+    println(findFirst[Int](secondIntArray, (a: Int) => a==10))
+    println(isSorted[Int](secondIntArray, (a,b)=> a < b))
   }
 }
