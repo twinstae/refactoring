@@ -27,8 +27,8 @@ describe('basic types', () => {
         }
 
         const colorList: Color[] = [
-            Color.red, Color.blue,
-            Color.red, Color.blue, Color.red
+            Color.red, Color.green,
+            Color.red, Color.green, Color.red
         ];
         
         function keysOfEnum(enumObj: object): string[] {
@@ -44,7 +44,7 @@ describe('basic types', () => {
 
         function enumCounter<T>(
             enumObj: object, enumList: T[]
-        ): EnumCounter{
+        ): EnumCounter {
             const initial: EnumCounter = {};
             return keysOfEnum(enumObj).reduce((result, color)=>({
                 ...result,
@@ -55,8 +55,8 @@ describe('basic types', () => {
         const colorsCount = enumCounter(Color, colorList);
         console.log(colorsCount);
         expect(colorsCount.red).toBe(3);
-        expect(colorsCount.green).toBe(0);
-        expect(colorsCount.blue).toBe(2);
+        expect(colorsCount.green).toBe(2);
+        expect(colorsCount.blue).toBe(0);
     })
 })
 
