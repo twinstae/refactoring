@@ -54,6 +54,15 @@ object Chapter2 {
     loop(1)
   }
 
+  def curry[A,B,C](f: (A,B) => C): A => (B => C) =
+    (a: A) => (b: B) => f(a, b)
+
+  def uncurry[A,B,C](f: A=>B=>C): (A,B)=>C =
+    (a: A, b:B) => f(a)(b)
+
+  def compose[A,B,C](f: B=>C, g: A=>B): A=>C =
+    (a: A) => f(g(a))
+
   def main(args: Array[String]): Unit ={
     println(formatAbs(-42))
     println()
@@ -71,5 +80,16 @@ object Chapter2 {
     val secondIntArray = Array(1,2,3,10,1)
     println(findFirst[Int](secondIntArray, (a: Int) => a==10))
     println(isSorted[Int](secondIntArray, (a,b)=> a < b))
+
+    val curriedIsSortedInt = curry(isSorted[Int]);
+    println(
+      curriedIsSortedInt
+      (secondIntArray)
+      ((a, b) => a<b)
+    ) // isSorted를 curry해서 두 번에 나눠서 parameter를 전달
+
+    println(
+      uncurry(curriedIsSortedInt)(secondIntArray, (a,b)=> a < b)
+    ) // 다시 uncurry, isSorted[Int]와 같다
   }
 }
