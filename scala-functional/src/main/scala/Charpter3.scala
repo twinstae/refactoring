@@ -6,15 +6,17 @@ case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
 object List {
-  def sum(ints: List[Int]): Int = ints match {
+  @tailrec
+  def sum(ints: List[Int], acc: Int = 0): Int = ints match {
     case Nil => 0
-    case Cons(x, xs) => x + sum(xs)
+    case Cons(x, xs) => sum(xs, acc+x)
   }
 
-  def product(ds: List[Double]): Double = ds match {
+  @tailrec
+  def product(ds: List[Double], acc:Double =1.0): Double = ds match {
     case Nil => 1.0
-    case Cons(0.0, _) => 0.0
-    case Cons(x, xs) => x * product(xs)
+    case Cons(0, _) => 0
+    case Cons(x, xs) => product(xs, x * acc)
   }
 
   def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B =
@@ -27,8 +29,11 @@ object List {
   def foldLeft[A, B](as: List[A], z: B)(f: (B, A) => B): B =
     as match {
       case Nil => z
-      case Cons(x, xs) =>foldLeft(xs, f(z, x))(f)
+      case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
     }
+
+  def reverse[A](list: List[A]): List[A] =
+    foldLeft(list, Nil: List[A])((z, x)=>Cons(x, z))
 
   def foldRightByLeft[A, B](l: List[A], z: B)(f: (A, B) => B): B ={
     foldLeft(reverse(l), z)((b,a) => f(a,b))
@@ -38,13 +43,13 @@ object List {
     foldLeft(listOfList, Nil: List[A])((z, x) => append(z, x))
 
   def sum2(ns: List[Int]): Int =
-    foldRight(ns, 0)((x, y)=>x+y)
+    foldRightByLeft(ns, 0)((x, y)=>x+y)
 
   def product2(ns: List[Double]): Double =
-    foldRight(ns, 1.0)(_ * _)
+    foldRightByLeft(ns, 1.0)(_ * _)
 
   def length[A](as: List[A]): Int = {
-    foldRight(as, 0)((_, b)=>b+1)
+    foldRightByLeft(as, 0)((_, b)=>b+1)
   }
 
   def apply[T](as: T*): List[T] =
@@ -83,9 +88,6 @@ object List {
       case Cons(head, tail) => Cons(head, init(tail))
     }
   }
-
-  def reverse[A](list: List[A]): List[A] =
-    foldLeft(list, Nil: List[A])((z, x)=>Cons(x, z))
 
   def append[A](a: List[A], b: List[A]): List[A] =
     foldRightByLeft(a, b)((xs, z)=>Cons(xs, z))
