@@ -14,5 +14,4 @@ object StringSpecification extends Properties("String") {
   property("substring") = forAll { (a: String, b: String, c: String) =>
     (a+b+c).substring(a.length, a.length+b.length) == b
   }
-
 }

@@ -1,7 +1,10 @@
-import scala.:+
+package Ch3
+
 import scala.annotation.tailrec
 
-sealed trait List[+A]
+sealed trait List[+A]{
+
+}
 case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
@@ -93,7 +96,7 @@ object List {
     foldRightByLeft(a, b)((xs, z)=>Cons(xs, z))
 
   def map[A,B](as: List[A])(f: A=>B): List[B] =
-    foldRightByLeft(as, Nil: List[B])((a,listB)=>Cons(f(a), listB))
+    foldRightByLeft(as, Nil: List[B])((a, listB)=>Cons(f(a), listB))
 
   def filter[A](as: List[A])(f: A=>Boolean): List[A] =
     foldRightByLeft(as, Nil: List[A])((a, listA)=>{
@@ -159,7 +162,7 @@ object List {
     println(product2(List(1.0, 2.0, 3.0, 4.0))
       == 24.0)
     // 3.8
-    println(foldRight(List(1, 2, 3), Nil: List[Int])((a,b)=>Cons(a * 2,b))
+    println(foldRight(List(1, 2, 3), Nil: List[Int])((a, b)=>Cons(a * 2,b))
       == List(2,4,6))
     // 3.9
     println(length(List(2,2,2))

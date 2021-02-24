@@ -1,4 +1,7 @@
+package Ch4
+
 object Chapter4 {
+
   sealed trait Option[+A] {
     def map[B](f: A => B): Option[B] = this match {
       case None => None
@@ -15,7 +18,7 @@ object Chapter4 {
     }
 
     def orElse[B >: A](ob: => Option[B]): Option[B] =
-      map((x:A) => Some(x)).getOrElse(ob)
+      map((x: A) => Some(x)).getOrElse(ob)
 
     def filter(f: A => Boolean): Option[A] =
       if (map(f).getOrElse(false)) this
@@ -23,6 +26,7 @@ object Chapter4 {
   }
 
   case class Some[+A](get: A) extends Option[A]
+
   case object None extends Option[Nothing]
 
   def variance(xs: Seq[Double]): Option[Double] = {
@@ -34,10 +38,10 @@ object Chapter4 {
     average(xs).flatMap(m => average(xs.map(x => math.pow(x - m, 2))))
   }
 
-  def main(args: Array[String]): Unit ={
+  def main(args: Array[String]): Unit = {
     // 연습문제 4.2
     // 9 4 1 0 1 4 9 / 7 = 28 / 7 = 4.0
-    println(variance(Seq(1,2,3,4,5,6,7)) == Some(4.0))
+    println(variance(Seq(1, 2, 3, 4, 5, 6, 7)) == Some(4.0))
     //
   }
 }
