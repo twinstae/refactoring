@@ -3,6 +3,7 @@ from typing import List, Any, Optional
 from unittest import TestCase
 
 from sqlalchemy.engine.base import Connection
+from sqlalchemy.orm import Session
 from typing_extensions import TypedDict
 
 
@@ -16,25 +17,25 @@ engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 
 
 class SqlAlchemyTest(TestCase):
-    conn: Connection = engine.connect()
+    session = Session(engine)
 
     @classmethod
     def setUpClass(cls) -> None:
-        print(type(cls.conn))
-        cls.conn.execute(text(f'''CREATE TABLE {ARTICLES} (title text, body text);'''))
+        print(type(cls.session))
+        cls.session.execute(text(f'''CREATE TABLE {ARTICLES} (title text, body text);'''))
 
     def tearDown(self) -> None:
-        self.conn.execute(text(f'''DELETE FROM {ARTICLES}'''))
+        self.session.execute(text(f'''DELETE FROM {ARTICLES}'''))
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.conn.close()
+        cls.session.close()
 
     def write_article(self, article: Article):
-        self.conn.execute(f"INSERT INTO {ARTICLES} VALUES (:title, :body);", article)
+        self.session.execute(f"INSERT INTO {ARTICLES} VALUES (:title, :body);", article)
 
     def get_articles(self) -> List[Any]:
-        cursor = self.conn.execute(f"SELECT * FROM {ARTICLES};")
+        cursor = self.session.execute(f"SELECT * FROM {ARTICLES};")
         return cursor.fetchall()
 
     def test_write_article(self):
@@ -46,7 +47,7 @@ class SqlAlchemyTest(TestCase):
         assert article == ("제목", "내용")
 
     def write_many_articles(self, articles: List[Article]):
-        self.conn.execute(text(f"INSERT INTO {ARTICLES} VALUES (:title, :body);"), articles)
+        self.session.execute(text(f"INSERT INTO {ARTICLES} VALUES (:title, :body);"), articles)
 
     def test_write_many_article(self):
         self.write_many_articles([
@@ -60,5 +61,5 @@ class SqlAlchemyTest(TestCase):
         assert articles == [("제목", "내용"), ("title", "body")]
 
     def get_article_by_title(self, title) -> Optional[Any]:
-        cursor = self.conn.execute(f"SELECT * FROM {ARTICLES} WHERE title=:title;", {"title": title})
+        cursor = self.session.execute(f"SELECT * FROM {ARTICLES} WHERE title=:title;", {"title": title})
         return cursor.fetchone()
