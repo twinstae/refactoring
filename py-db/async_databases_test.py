@@ -6,6 +6,10 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.testclient import TestClient
 
+ARTICLE_2 = {"title": "title", "body": "body"}
+
+ARTICLE_1 = {"title": "제목", "body": "내용"}
+
 DATABASE_URL = "sqlite:///./test.db"
 
 database = databases.Database(DATABASE_URL)
@@ -76,17 +80,14 @@ class SqlAlchemyTest(TestCase):
         self.client.delete("/articles/")
 
     def test_write_article(self):
-        self.client.post("/articles/", json={"title": "제목", "body": "내용"})
+        self.client.post("/articles/", json=ARTICLE_1)
 
         response = self.client.get("/articles/")
-        assert response.json() == [{"id": 1, "title": "제목", "body": "내용"}]
+        assert response.json() == [{"id": 1, **ARTICLE_1}]
 
     def test_write_many_articles(self):
-        self.client.post("/articles/", json={"title": "제목", "body": "내용"})
-        self.client.post("/articles/", json={"title": "title", "body": "body"})
+        self.client.post("/articles/", json=ARTICLE_1)
+        self.client.post("/articles/", json=ARTICLE_2)
 
         response = self.client.get("/articles/")
-        assert response.json() == [
-            {"id": 1, "title": "제목", "body": "내용"},
-            {"id": 2, "title": "title", "body": "body"}
-        ]
+        assert response.json() == [{"id": 1, **ARTICLE_1}, {"id": 2, **ARTICLE_2}]
