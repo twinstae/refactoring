@@ -80,3 +80,13 @@ class SqlAlchemyTest(TestCase):
 
         response = self.client.get("/articles/")
         assert response.json() == [{"id": 1, "title": "제목", "body": "내용"}]
+
+    def test_write_many_articles(self):
+        self.client.post("/articles/", json={"title": "제목", "body": "내용"})
+        self.client.post("/articles/", json={"title": "title", "body": "body"})
+
+        response = self.client.get("/articles/")
+        assert response.json() == [
+            {"id": 1, "title": "제목", "body": "내용"},
+            {"id": 2, "title": "title", "body": "body"}
+        ]
