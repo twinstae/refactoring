@@ -1,27 +1,22 @@
-from sqlalchemy import create_engine, Table, Column, Integer, String, insert, select, delete
-from typing import List, Any, Tuple
+from sqlalchemy import create_engine, Column, Integer, String, select, delete
+from typing import List, Tuple
 from unittest import TestCase
-from sqlalchemy.orm import Session
-from typing_extensions import TypedDict
-from sqlalchemy import MetaData
-
-
-class Article(TypedDict):
-    title: str
-    body: str
-
+from sqlalchemy.orm import Session, declarative_base
 
 ARTICLES = "ARTICLES"
 engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
-metadata = MetaData()
+Base = declarative_base()
 
-article_table = Table(
-    "ARTICLES",
-    metadata,
-    Column('id', Integer, primary_key=True),
-    Column('title', String(128), nullable=False),
-    Column('body', String(512), nullable=False)
-)
+
+class Articles(Base):
+    __tablename__ = "ARTICLES"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(128), nullable=False)
+    body = Column(String(512), nullable=False)
+
+    def __repr__(self):
+        return f"Article(id={self.id!r}, title={self.title!r}, body={self.body!r})"
 
 
 class SqlAlchemyTest(TestCase):
@@ -29,36 +24,37 @@ class SqlAlchemyTest(TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        metadata.create_all(engine)
+        Base.metadata.create_all(engine)
 
     def tearDown(self) -> None:
-        self.session.execute(article_table.delete())
+        self.session.execute(delete(Articles))
 
     @classmethod
     def tearDownClass(cls) -> None:
         cls.session.close()
 
-    def write_articles(self, articles: List[Article]):
-        self.session.execute(article_table.insert(), articles)
-        self.session.commit()
+    def write_articles(self, articles: List[Articles]):
+        self.session.add_all(articles)
+        self.session.flush()
 
-    def get_articles(self) -> List[Tuple[int, str, str]]:
-        cursor = self.session.execute(article_table.select())
-        return cursor.fetchall()
+    def get_articles(self) -> List[Articles]:
+        return self.session.query(Articles).all()
 
     def test_write_article(self):
-        self.write_articles([{"title": "제목", "body": "내용"}])
+        articles = [
+            Articles(title="제목", body="내용")
+        ]
+        self.write_articles(articles)
 
-        articles = self.get_articles()
-
-        assert articles == [(1, "제목", "내용")]
+        result = self.get_articles()
+        assert result == articles
 
     def test_write_many_article(self):
-        self.write_articles([
-            {"title": "제목", "body": "내용"},
-            {"title": "title", "body": "body"}
-        ])
+        articles = [
+            Articles(title="제목", body="내용"),
+            Articles(title="title", body="body")
+        ]
+        self.write_articles(articles)
 
-        articles = self.get_articles()
-
-        assert articles == [(1, "제목", "내용"), (2, "title", "body")]
+        result = self.get_articles()
+        assert result == articles
