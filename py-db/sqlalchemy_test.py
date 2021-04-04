@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, select, delete
-from typing import List, Tuple
+from sqlalchemy import create_engine, Column, Integer, String, delete
+from typing import List
 from unittest import TestCase
 from sqlalchemy.orm import Session, declarative_base
 
