@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
-
-from pydantic_models import ArticleOut, UserIn
+from pydantic_models import UserIn
 
 
 class ABService(ABC):

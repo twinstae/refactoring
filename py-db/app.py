@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 
 app = FastAPI()
-my_service: ABService.__class__ = AioSqliteService
+my_service = AioSqliteService
 
 name_to_service = {
     service.name: service
