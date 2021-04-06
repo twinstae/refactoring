@@ -1,81 +1,130 @@
 import aiosqlite
-from sqlite3 import Row
-from typing import List, Tuple, Coroutine, Any, Iterable, Optional
-from unittest import TestCase
+from typing import List, Optional
+from aiosqlite import Connection
+from fastapi import FastAPI
+from pydantic import BaseModel
+from starlette.testclient import TestClient
 
-TEST_USER_NAME = "test"
+TEST_USER_NAME = "테스트유저"
 
 ARTICLES = "ARTICLES"
-USER = "USER"
+USERS = "USERS"
+USER_1 = {"name": "테스트유저"}
+ARTICLE_1 = {"title": "제목", "body": "내용", "author_id": 1}
+ARTICLE_2 = {"title": "title", "body": "body", "author_id": 1}
+ARTICLE_1_WITH_AUTHOR = {'author': {'id': 1, 'name': '테스트유저'}, 'id': 1, 'body': '내용', 'title': '제목'}
+ARTICLE_2_WITH_AUTHOR = {'author': {'id': 1, 'name': '테스트유저'}, 'id': 2, 'title': 'title', 'body': 'body'}
 
 
-class Sqlite3Test(TestCase):
-    con = aiosqlite.connect(':memory:')
+class UserIn(BaseModel):
+    name: str
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.con.execute(f'''CREATE TABLE {ARTICLES} (
-            id integer primary key,
-            title text,
-            body text,
-            FOREIGN KEY(author) REFERENCES USER(id)
-        );''')
-        cls.con.execute(f'''CREATE TABLE {USER} (
+
+class UserOut(BaseModel):
+    id: int
+    name: str
+
+
+class ArticleIn(BaseModel):
+    title: str
+    body: str
+    author_id: int
+
+
+class ArticleOut(BaseModel):
+    id: int
+    title: str
+    body: str
+    author: UserOut
+
+
+app = FastAPI()
+con = Optional[Connection]
+
+
+@app.post("/setup/")
+async def setup_request():
+    global con
+    con = await aiosqlite.connect(':memory:')
+    await con.execute(f'''
+        CREATE TABLE {USERS} (
             id integer primary key,
             name varchar
         );''')
-        cls.con.execute(f"INSERT INTO {USER} VALUES (?);", (TEST_USER_NAME,))
 
-    def tearDown(self) -> None:
-        self.con.execute(f'''DELETE FROM {ARTICLES}''')
-        self.con.commit()
+    await con.execute(f"INSERT INTO {USERS}(name) VALUES (?);", (TEST_USER_NAME, ))
+    await con.execute(f'''
+        CREATE TABLE {ARTICLES} (
+            id integer primary key,
+            title text,
+            body text,
+            author_id integer,
+            FOREIGN KEY(author_id) REFERENCES {USERS}(id)
+        );''')
+
+
+@app.get("/articles/", response_model=List[ArticleOut])
+async def read_articles():
+    cursor = await con.execute(f"""
+        SELECT * FROM {ARTICLES}
+        INNER JOIN {USERS}
+        ON {ARTICLES}.author_id={USERS}.id;
+    """)
+    result = await cursor.fetchall()
+    return [ArticleOut(
+        id=row[0], title=row[1], body=row[2],
+        author=UserOut(id=row[4], name=row[5])
+    ) for row in result]
+
+
+@app.post("/articles/")
+async def create_article(article: ArticleIn):
+    query = f"INSERT INTO {ARTICLES}(title, body, author_id) VALUES (?, ?, ?);"
+    await con.execute(query, (
+        article.title,
+        article.body,
+        article.author_id
+    ))
+
+
+@app.delete("/articles/")
+async def delete_all_articles():
+    await con.execute(f'''DELETE FROM {ARTICLES}''')
+
+
+@app.delete("/teardown/")
+async def teardown():
+    await con.execute(f'''DELETE FROM {USERS}''')
+    await con.close()
+
+
+class TestAioSqlite:
+    client = TestClient(app)
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        cls.con.close()
+    def setup_class(cls):
+        cls.client.post("/setup/")
 
-    async def write_article(self, title: str, body: str, author_id: int):
-        await self.con.execute(f"INSERT INTO {ARTICLES} VALUES (?, ?, ?);", (title, body, author_id))
+    @classmethod
+    def teardown_class(cls):
+        cls.client.delete("/teardown/")
 
-    async def get_article_by_title(self, title: str) -> Coroutine[Any, Any, Optional[Row]]:
-        cursor = await self.con.execute(f"SELECT * FROM {ARTICLES} WHERE title=:title;", {"title": title})
-        return cursor.fetchone()
+    def teardown_method(self, method) -> None:
+        self.client.delete("/articles/")
 
-    async def test_write_article(self):
-        await self.write_article("제목", "내용", 1)
-        await self.con.commit()
+    def test_write_article(self):
+        self.client.post("/articles/", json=ARTICLE_1)
 
-        article = await self.get_article_by_title("제목")
+        response = self.client.get("/articles/")
+        result = response.json()
+        print(result)
+        assert result == [ARTICLE_1_WITH_AUTHOR]
 
-        assert article == (1, "제목", "내용")
+    def test_write_many_articles(self):
+        self.client.post("/articles/", json=ARTICLE_1)
+        self.client.post("/articles/", json=ARTICLE_2)
 
-    async def get_articles(self) -> Coroutine[Any, Any, Iterable[Row]]:
-        cursor = await self.con.execute(f"SELECT * FROM {ARTICLES};")
-        return cursor.fetchall()
-
-    async def write_many_articles(self, articles: List[Tuple[str, str, int]]):
-        await self.con.executemany(f"INSERT INTO {ARTICLES} VALUES (?, ?, ?);", articles)
-
-    async def test_write_many_article(self):
-        await self.write_many_articles([("제목", "내용", 1), ("title", "body", 1)])
-        await self.con.commit()
-
-        articles = await self.get_articles()
-
-        assert articles == [(1, "제목", "내용"), (2, "title", "body")]
-
-    async def get_article_with_author(self, title: str) -> Coroutine[Any, Any, Iterable[Row]]:
-        cursor = await self.con.execute(f"""
-            SELECT * FROM {ARTICLES}
-            INNER JOIN {USER}
-            ON {ARTICLES}.author={USER}.id
-            WHERE title=:title;""", {"title": title})
-        return cursor.fetchone()
-
-    async def test_get_article_with_author(self):
-        await self.write_article("제목", "내용", 1)
-        await self.con.commit()
-
-        article = await self.get_article_with_author("제목")
-
-        assert article == (1, "제목", "내용", TEST_USER_NAME)
+        response = self.client.get("/articles/")
+        result = response.json()
+        print(result)
+        assert result == [ARTICLE_1_WITH_AUTHOR, ARTICLE_2_WITH_AUTHOR]
