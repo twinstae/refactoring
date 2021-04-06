@@ -1,5 +1,6 @@
-from tortoise.models import Model
 from tortoise import fields, Tortoise
+from tortoise.models import Model
+from tortoise.utils import get_schema_sql
 from pydantic_models import ArticleIn, UserIn
 from services import ABService
 
@@ -34,6 +35,8 @@ class TortoiseService(ABService):
             db_url=DATABASE_URL,
             modules={'models': ['services.tortoise_service']}
         )
+        sql = get_schema_sql(Tortoise.get_connection("default"), safe=False)
+        print(sql)
         await Tortoise.generate_schemas()
 
     @classmethod

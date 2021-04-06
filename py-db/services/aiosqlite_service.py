@@ -3,8 +3,8 @@ from aiosqlite import Connection
 from pydantic_models import ArticleOut, ArticleIn, UserOut, UserIn
 from services.ab_service import ABService
 
-ARTICLES = "ARTICLES"
-USERS = "USERS"
+ARTICLE = "ARTICLE"
+USER = "USER"
 
 
 class AioSqliteService(ABService):
@@ -15,35 +15,34 @@ class AioSqliteService(ABService):
     async def setup(cls):
         cls.con = await aiosqlite.connect(':memory:')
         await cls.con.execute(f'''
-                CREATE TABLE {USERS} (
-                    id integer primary key,
-                    name varchar
+                CREATE TABLE {USER} (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    "name" VARCHAR(16) NOT NULL
                 );''')
 
         await cls.con.execute(f'''
-                CREATE TABLE {ARTICLES} (
-                    id integer primary key,
-                    title text,
-                    body text,
-                    author_id integer,
-                    FOREIGN KEY(author_id) REFERENCES {USERS}(id)
+                CREATE TABLE {ARTICLE} (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    "title" VARCHAR(128) NOT NULL,
+                    "body" TEXT NOT NULL,
+                    "author_id" INT NOT NULL REFERENCES "{USER}" ("id") ON DELETE CASCADE
                 );''')
 
     @classmethod
     async def teardown(cls):
-        await cls.con.execute(f'''DELETE FROM {USERS}''')
+        await cls.con.execute(f'''DELETE FROM {USER}''')
         await cls.con.close()
 
     @classmethod
     async def create_user(cls, user_in: UserIn) -> None:
-        await cls.con.execute(f"INSERT INTO {USERS}(name) VALUES (:name);", user_in.dict())
+        await cls.con.execute(f"INSERT INTO {USER}(name) VALUES (:name);", user_in.dict())
 
     @classmethod
     async def get_user_articles(cls, user_name: str):
         cursor = await cls.con.execute(f"""
-                SELECT * FROM {USERS}
-                INNER JOIN {ARTICLES}
-                ON {ARTICLES}.author_id={USERS}.id;
+                SELECT * FROM {USER}
+                INNER JOIN {ARTICLE}
+                ON {ARTICLE}.author_id={USER}.id;
             """)
         result = await cursor.fetchall()
         return [ArticleOut(
@@ -54,9 +53,9 @@ class AioSqliteService(ABService):
     @classmethod
     async def read_articles(cls):
         cursor = await cls.con.execute(f"""
-                SELECT * FROM {ARTICLES}
-                INNER JOIN {USERS}
-                ON {ARTICLES}.author_id={USERS}.id;
+                SELECT * FROM {ARTICLE}
+                INNER JOIN {USER}
+                ON {ARTICLE}.author_id={USER}.id;
             """)
         result = await cursor.fetchall()
         return [ArticleOut(
@@ -66,13 +65,13 @@ class AioSqliteService(ABService):
 
     @classmethod
     async def create_article(cls, article: ArticleIn):
-        cur = await cls.con.execute(f"SELECT id FROM {USERS};")
+        cur = await cls.con.execute(f"SELECT id FROM {USER};")
         author_id = await cur.fetchone()
-        query = f"INSERT INTO {ARTICLES}(title, body, author_id) VALUES (?, ?, ?);"
+        query = f"INSERT INTO {ARTICLE}(title, body, author_id) VALUES (?, ?, ?);"
         await cls.con.execute(query, (
             article.title, article.body, author_id[0]
         ))
 
     @classmethod
     async def delete_all_articles(cls):
-        await cls.con.execute(f'''DELETE FROM {ARTICLES}''')
+        await cls.con.execute(f'''DELETE FROM {ARTICLE}''')
