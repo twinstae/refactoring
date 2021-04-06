@@ -1,24 +1,28 @@
 from tortoise.models import Model
 from tortoise import fields, Tortoise
-from pydantic_models import ArticleIn
+from pydantic_models import ArticleIn, UserIn
 from services import ABService
 
-name = "tortoise"
-
 DATABASE_URL = "sqlite://test.db"
-USER_1 = {"name": "테스트유저"}
 
 
 class User(Model):
     id = fields.IntField(pk=True)
     name = fields.CharField(16)
+    articles = fields.ReverseRelation["Article"]
+
+    def __repr__(self):
+        return f"User(id={self.id}, name={self.name})"
 
 
 class Article(Model):
     id = fields.IntField(pk=True)
     title = fields.CharField(128)
     body = fields.TextField()
-    author = fields.ForeignKeyField('models.User')
+    author = fields.ForeignKeyField('models.User', related_name="articles")
+
+    def __repr__(self):
+        return f"Article(id={self.id}, title={self.title}, body={self.body}, author={self.author!r})"
 
 
 class TortoiseService(ABService):
@@ -27,12 +31,27 @@ class TortoiseService(ABService):
     @classmethod
     async def setup(cls):
         await Tortoise.init(
-            db_url='sqlite://:memory:',
+            db_url=DATABASE_URL,
             modules={'models': ['services.tortoise_service']}
         )
         await Tortoise.generate_schemas()
 
-        await User.create(**USER_1)
+    @classmethod
+    async def teardown(cls):
+        await User.all().delete()
+        await Tortoise.close_connections()
+
+    @classmethod
+    async def create_user(cls, user_in: UserIn) -> None:
+        await User.create(**user_in.dict())
+        # user_2 = User(**user_in.dict())
+        # await user_2.save()
+
+    @classmethod
+    async def get_user_articles(cls, user_name: str):
+        user = await User.get_or_none(name=user_name)
+        articles = await Article.filter(author=user).prefetch_related('author')
+        return articles or []
 
     @classmethod
     async def read_articles(cls):
@@ -46,8 +65,3 @@ class TortoiseService(ABService):
     @classmethod
     async def delete_all_articles(cls):
         await Article.all().delete()
-
-    @classmethod
-    async def teardown(cls):
-        await User.all().delete()
-        await Tortoise.close_connections()

@@ -1,12 +1,11 @@
 import databases
 import sqlalchemy as sa
 from sqlalchemy import select
-from pydantic_models import ArticleIn, ArticleOut, UserOut
+from pydantic_models import ArticleIn, ArticleOut, UserOut, UserIn
 from services import ABService
 
 DATABASE_URL = "sqlite:///./test.db"
 metadata = sa.MetaData()
-USER_1 = {"name": "테스트유저"}
 
 users_table = sa.Table(
     "USERS",
@@ -37,12 +36,25 @@ class DatabasesService(ABService):
     async def setup(cls):
         metadata.create_all(engine)
         await cls.database.connect()
-        await cls.database.execute(users_table.insert(), USER_1)
 
     @classmethod
     async def teardown(cls):
         await cls.database.disconnect()
         await cls.database.execute(users_table.delete())
+
+    @classmethod
+    async def create_user(cls, user_in: UserIn) -> None:
+        await cls.database.execute(users_table.insert(), user_in.dict())
+
+    @classmethod
+    async def get_user_articles(cls, user_name: str):
+        j = users_table.join(articles_table, users_table.c.id == articles_table.c.author_id)
+        query = select([articles_table, users_table]).select_from(j)
+        result = await cls.database.fetch_all(query)
+        return [ArticleOut(
+            id=row[0], title=row[1], body=row[2],
+            author=UserOut(id=row[4], name=row[5])
+        ) for row in result]
 
     @classmethod
     async def read_articles(cls):

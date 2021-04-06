@@ -1,11 +1,10 @@
 import aiosqlite
 from aiosqlite import Connection
-from pydantic_models import ArticleOut, ArticleIn, UserOut
+from pydantic_models import ArticleOut, ArticleIn, UserOut, UserIn
 from services.ab_service import ABService
 
 ARTICLES = "ARTICLES"
 USERS = "USERS"
-USER_1 = {"name": "테스트유저"}
 
 
 class AioSqliteService(ABService):
@@ -30,12 +29,27 @@ class AioSqliteService(ABService):
                     FOREIGN KEY(author_id) REFERENCES {USERS}(id)
                 );''')
 
-        await cls.con.execute(f"INSERT INTO {USERS}(name) VALUES (:name);", USER_1)
-
     @classmethod
     async def teardown(cls):
         await cls.con.execute(f'''DELETE FROM {USERS}''')
         await cls.con.close()
+
+    @classmethod
+    async def create_user(cls, user_in: UserIn) -> None:
+        await cls.con.execute(f"INSERT INTO {USERS}(name) VALUES (:name);", user_in.dict())
+
+    @classmethod
+    async def get_user_articles(cls, user_name: str):
+        cursor = await cls.con.execute(f"""
+                SELECT * FROM {USERS}
+                INNER JOIN {ARTICLES}
+                ON {ARTICLES}.author_id={USERS}.id;
+            """)
+        result = await cursor.fetchall()
+        return [ArticleOut(
+            id=row[2], title=row[3], body=row[4],
+            author=UserOut(id=row[0], name=row[1])
+        ) for row in result]
 
     @classmethod
     async def read_articles(cls):

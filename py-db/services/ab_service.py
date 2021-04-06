@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from pydantic_models import ArticleOut
+from pydantic_models import ArticleOut, UserIn
 
 
 class ABService(ABC):
@@ -13,7 +13,6 @@ class ABService(ABC):
         """
         1. 커넥션, 세션 등을 초기화한다
         2. 테이블을 생성한다
-        3. User1을 추가한다 -> 분리 예정
         """
 
     @classmethod
@@ -26,10 +25,25 @@ class ABService(ABC):
 
     @classmethod
     @abstractmethod
-    async def read_articles(cls) -> List[ArticleOut]:
+    async def create_user(cls, user_in: UserIn) -> None:
         """
-        :return: 모든 Article 을 Author 와 함께 조인해서 가져오고,
-        pydantic 모델로 반환한다.
+        UserIn 으로 유저를 생성한다
+        """
+
+    @classmethod
+    @abstractmethod
+    async def get_user_articles(cls, user_name: str):
+        """
+        user_name 으로 user 를 찾아서. 해당 유저가 쓴 모든 Article 을 가져온다.
+        :return: List[Article, ArticleOut]
+        """
+
+    @classmethod
+    @abstractmethod
+    async def read_articles(cls):
+        """
+        모든 Article 을 Author 와 함께 조인해서 가져온다.
+        :return: List[Article, ArticleOut]
         """
 
     @classmethod

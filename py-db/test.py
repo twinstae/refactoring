@@ -1,14 +1,12 @@
-from services import TortoiseService, AioSqliteService, DatabasesService
+from services import TortoiseService, DatabasesService
 from template import TestTemplate
 
-
-class AioSqliteTest(TestTemplate):
-    service_name = AioSqliteService.name
-
-
-class TortoiseTest(TestTemplate):
-    service_name = TortoiseService.name
+# class AioSqliteTest(TestTemplate): 템플릿과 같다
 
 
 class DatabasesTest(TestTemplate):
     service_name = DatabasesService.name
+
+
+class TortoiseTest(TestTemplate):
+    service_name = TortoiseService.name
