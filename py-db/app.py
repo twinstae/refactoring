@@ -1,5 +1,5 @@
 from pydantic_models import ArticleOut, ArticleIn, UserIn
-from services import ABService, AioSqliteService, TortoiseService, DatabasesService
+from services import AioSqliteService, TortoiseService, DatabasesService, AsyncpgService
 from typing import List
 from fastapi import FastAPI
 
@@ -12,7 +12,8 @@ name_to_service = {
     for service in [
         AioSqliteService,
         TortoiseService,
-        DatabasesService
+        DatabasesService,
+        AsyncpgService
     ]
 }
 

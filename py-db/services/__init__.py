@@ -1,4 +1,5 @@
 from services.ab_service import ABService
 from services.aiosqlite_service import AioSqliteService
+from services.asyncpg_service import AsyncpgService
 from services.databases_service import DatabasesService
 from services.tortoise_service import TortoiseService
