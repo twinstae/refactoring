@@ -1,8 +1,6 @@
 package Ch7
 
-import java.util.concurrent.{Callable, ExecutorService, Executors, Future, TimeUnit}
-
-import scala.::
+import java.util.concurrent.{ExecutorService, Executors, Future, TimeUnit}
 
 object Par {
   type Par[A] = ExecutorService => Future[A]
