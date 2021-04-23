@@ -2,6 +2,9 @@ package Ch7
 
 import java.util.concurrent.{Callable, CountDownLatch, ExecutorService, Executors}
 import java.util.concurrent.atomic.AtomicReference
+
+import Ch7.Nonblocking.Par.{unit, unit_list}
+
 import language.implicitConversions
 
 object Nonblocking {
@@ -22,6 +25,9 @@ object Nonblocking {
 
     def unit[A](a: A): Par[A] =
       es => (k: A => Unit) => k(a)
+
+    def unit_list[A](a_list: List[A]): List[Par[A]] =
+      a_list.map(unit)
 
     def fork[A](a: => Par[A]): Par[A] =
       es => (cb: A => Unit) => eval(es)(a(es)(cb))
@@ -85,6 +91,12 @@ object Nonblocking {
 
     def parMap[A,B](as: IndexedSeq[A])(f: A => B): Par[IndexedSeq[B]] =
       sequenceBalanced(as.map(asyncF(f)))
+
+    def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] =
+      es => choices(run(es)(n))(es)
+
+    def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
+      choiceN(map(cond)(b=>if(b) 1 else 0))(List(f, t))
   }
 
   def assertEqual[T](actual: T, expected: T, passMsg: String=""): Unit = {
@@ -93,9 +105,19 @@ object Nonblocking {
     println("PASS! "+passMsg)
   }
 
+  def assertParEqual[T](es: ExecutorService)(p: Par[T], p2: Par[T], passMsg: String=""): Unit = {
+    val expected = Par.run(es)(p)
+    val actual = Par.run(es)(p2)
+    val message = s"\n expected: $expected\n actual  : $actual"
+    assert(expected == actual, message)
+    println("PASS! "+passMsg)
+  }
+
   def main(args: Array[String]): Unit = {
     val p = Par.parMap(List.range(1, 100000))(math.sqrt(_))
-    val x: List[Double] = Par.run(Executors.newFixedThreadPool(4))(p)
+
+    val es = Executors.newFixedThreadPool(4)
+    val x: List[Double] = Par.run(es)(p)
 
     assertEqual(x.slice(0, 10), List(
       1.0,
@@ -109,5 +131,10 @@ object Nonblocking {
       3.0,
       3.1622776601683795
     ))
+
+    assertParEqual(es)(Par.choiceN(unit(1))(unit_list(List("영", "일"))), unit("일"))
+    assertParEqual(es)(Par.choice(unit(true))(unit("참"), unit("거짓")), unit("참"))
+    es.shutdown()
+    println("shutdown")
   }
 }
