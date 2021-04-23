@@ -1,35 +1,35 @@
 package Ch6
-import State._
+import Reducer._
 
-case class State[S, +A](run: S => (A, S)) {
-  def map[B](f: A => B): State[S, B] =
+case class Reducer[S, +A](run: S => (A, S)) {
+  def map[B](f: A => B): Reducer[S, B] =
     flatMap(a => unit(f(a)))
-  def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] =
+  def map2[B,C](sb: Reducer[S, B])(f: (A, B) => C): Reducer[S, C] =
     flatMap(a => sb.map(b => f(a, b)))
-  def flatMap[B](f: A => State[S, B]): State[S, B] = State(s => {
+  def flatMap[B](f: A => Reducer[S, B]): Reducer[S, B] = Reducer(s => {
     val (a, s1) = run(s)
     f(a).run(s1)
   })
 }
 
-object State {
-  type Rand[A] = State[RNG, A]
+object Reducer {
+  type Rand[A] = Reducer[RNG, A]
 
-  def unit[S, A](a: A): State[S, A] =
-    State(s => (a, s))
+  def unit[S, A](a: A): Reducer[S, A] =
+    Reducer(s => (a, s))
 
-  def sequence[S, A](l: List[State[S, A]]): State[S, List[A]] = {
+  def sequence[S, A](l: List[Reducer[S, A]]): Reducer[S, List[A]] = {
     l.reverse.foldLeft(unit[S, List[A]](List())) ((acc, f) => f.map2(acc)( _ :: _ ))
   }
 
-  def modify[S](f: S => S): State[S, Unit] = for {
+  def modify[S](f: S => S): Reducer[S, Unit] = for {
     s <- get
     _ <- set(f(s))
   } yield ()
 
-  def get[S]: State[S, S] = State(s => (s, s))
+  def get[S]: Reducer[S, S] = Reducer(s => (s, s))
 
-  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+  def set[S](s: S): Reducer[S, Unit] = Reducer(_ => ((), s))
 }
 
 sealed trait Input
@@ -51,7 +51,7 @@ object Candy {
           Machine(locked = true, candies - 1, coins) // 손잡이를 돌리면 사탕, 잠긴다
       }
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
+  def simulateMachine(inputs: List[Input]): Reducer[Machine, (Int, Int)] = for {
     _ <- sequence(inputs.map(input=>
         modify[Machine](update(input))))
     s <- get

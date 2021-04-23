@@ -199,8 +199,8 @@ object RNG {
     })
     println("PASS! rollDie 는 1 이상 6 이하인 값만을 반환한다.")
 
-    val simulate = simulateMachine(List(Coin, Turn, Coin, Turn, Turn, Coin))
-    val ((coins, candies), _) = simulate.run(Machine(locked = true, coins = 10, candies = 5))
+    val simulation = simulateMachine(List(Coin, Turn, Coin, Turn, Turn, Coin))
+    val ((coins, candies), _) = simulation.run(Machine(locked = true, coins = 10, candies = 5))
     assertEqual((coins, candies), (13, 3),
       "simulateMachine 을 수행하고 나면 코인 13개 캔디 3개가 남는다.")
   }
