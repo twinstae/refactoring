@@ -92,11 +92,14 @@ object Nonblocking {
     def parMap[A,B](as: IndexedSeq[A])(f: A => B): Par[IndexedSeq[B]] =
       sequenceBalanced(as.map(asyncF(f)))
 
-    def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] =
-      es => choices(run(es)(n))(es)
+    def choiceN[A](pn: Par[Int])(choices: List[Par[A]]): Par[A] =
+      chooser(pn)(choices(_))
 
     def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
-      choiceN(map(cond)(b=>if(b) 1 else 0))(List(f, t))
+      chooser(cond)(if(_) t else f)
+
+    def chooser[A, B](pa: Par[A])(choices: A => Par[B]): Par[B] =
+      es => choices(run(es)(pa))(es)
   }
 
   def assertEqual[T](actual: T, expected: T, passMsg: String=""): Unit = {
@@ -134,6 +137,8 @@ object Nonblocking {
 
     assertParEqual(es)(Par.choiceN(unit(1))(unit_list(List("영", "일"))), unit("일"))
     assertParEqual(es)(Par.choice(unit(true))(unit("참"), unit("거짓")), unit("참"))
+    val map = Map(1->"일", 2->"이", 3->"삼")
+    assertParEqual(es)(Par.chooser(unit(3))(n => unit(map.getOrElse(n, "없음"))), unit("삼"))
     es.shutdown()
     println("shutdown")
   }
