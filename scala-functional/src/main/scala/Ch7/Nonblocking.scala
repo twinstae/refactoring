@@ -99,7 +99,14 @@ object Nonblocking {
       chooser(cond)(if(_) t else f)
 
     def chooser[A, B](pa: Par[A])(choices: A => Par[B]): Par[B] =
-      es => choices(run(es)(pa))(es)
+      flatMap(pa)(choices)
+
+    def flatMap[A, B](a: Par[A])(f: A => Par[B]): Par[B] =
+      join(map(a)(f))
+
+    def join[A](a: Par[Par[A]]): Par[A] =
+      es => run(es)(a)(es)
+
   }
 
   def assertEqual[T](actual: T, expected: T, passMsg: String=""): Unit = {
