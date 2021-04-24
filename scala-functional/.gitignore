@@ -2,3 +2,8 @@ target
 .idea
 .metals
 coursier
+
+project/project
+project/target
+project/.bloop
+project/metals.sbt
