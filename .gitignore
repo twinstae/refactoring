@@ -2,3 +2,5 @@
 py-db/test.db
 py-db/test.db-wal
 py-db/test.db-shm
+
+rust-lang/target/*
