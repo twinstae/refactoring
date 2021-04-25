@@ -1,5 +1,8 @@
 package testing
 
+import fpinscala.state.RNG
+import Prop._
+
 case class Prop(run: (MaxSize, TestCases, RNG) => Result) {
   def &&(p: Prop) = Prop {
     (max, n, rng) => run(max, n, rng) match {
@@ -13,6 +16,13 @@ case class Prop(run: (MaxSize, TestCases, RNG) => Result) {
       case l => l
     }
   }
+
+  def tag(msg: String) = Prop {
+    (max,n,rng) => run(max,n,rng) match {
+      case Left(e) => Left(msg + "\n" + e)
+      case r => r
+    }
+  }
 }
 
 object Prop {
@@ -21,11 +31,12 @@ object Prop {
   type FailedCase = String
   type SuccessCount = Int
   type Result = Either[FailedCase, (Status, TestCases)]
+}
 
-  def check(p: => Boolean): Prop =
-    forAll(unit(()))(_ => p)
+sealed trait Status {}
 
-  def run
-
-  def forAll[A](a: Gen[A])(f: A => Boolean): Prop
+object Status {
+  case object Exhausted extends Status
+  case object Proven extends Status
+  case object Unfalsified extends Status
 }

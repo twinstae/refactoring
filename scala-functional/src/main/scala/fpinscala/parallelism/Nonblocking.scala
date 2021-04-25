@@ -1,15 +1,15 @@
-package Ch7
+package fpinscala.parallelism
 
 import java.util.concurrent.{Callable, CountDownLatch, ExecutorService, Executors}
 import java.util.concurrent.atomic.AtomicReference
-
-import Ch7.Nonblocking.Par.{unit, unit_list}
+import fpinscala.parallelism.Actor._
+import fpinscala.parallelism.Nonblocking.Par.{unit, unit_list}
 
 import language.implicitConversions
 
 object Nonblocking {
   trait Future[+A] {
-    private[Ch7] def apply(k: A => Unit): Unit
+    private[parallelism] def apply(k: A => Unit): Unit
   }
 
   type Par[+A] = ExecutorService => Future[A]

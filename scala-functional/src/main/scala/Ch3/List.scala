@@ -2,9 +2,8 @@ package Ch3
 
 import scala.annotation.tailrec
 
-sealed trait List[+A]{
+sealed trait List[+A]
 
-}
 case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
@@ -61,21 +60,26 @@ object List {
 
   def head[A](a: List[A]): A = a match {
     case Cons(head, _) => head
+    case Nil => sys.error("head of empty list")
   }
 
   def tail[T](list: List[T]): List[T] = list match {
-    case Nil => Nil
+    case Nil => sys.error("tail of empty list")
     case Cons(_, tail) => tail
   }
 
   def setHead[T](list: List[T], newHead: T): List[T] = list match {
+    case Nil => sys.error("setHead on empty list")
     case Cons(_, tail) => Cons(newHead, tail)
   }
 
   @tailrec
   def drop[T](list: List[T], n: Int): List[T] = {
     if (n <= 0) list
-    else list match { case Cons(head, tail) =>drop(tail, n-1) }
+    else list match {
+      case Cons(head, tail) =>drop(tail, n-1)
+      case Nil => Nil
+    }
   }
 
   @tailrec
@@ -83,12 +87,14 @@ object List {
     case Cons(head, tail) =>
       if (f(head)) dropWhile(tail, f)
       else l
+    case Nil => Nil
   }
 
   def init[A](l: List[A]): List[A] = {
     l match {
       case Cons(_, Nil) => Nil
       case Cons(head, tail) => Cons(head, init(tail))
+      case Nil => Nil
     }
   }
 
@@ -134,79 +140,81 @@ object List {
     case _ if startsWith(sup, sub) => true
     case Cons(_, t) => hasSubsequence(t, sub)
   }
+}
 
+object test_list {
   def main(args: Array[String]): Unit ={
     // 패턴 부합
     val x = List(1,2,3,4,5) match {
       case Cons(x, Cons(2, Cons(4, _))) => x
       case Nil => 42
       case Cons(x, Cons(y,  Cons(3,  Cons(4, _)))) => x + y // here!
-      case Cons(h, t) => h + sum(t)
+      case Cons(h, t) => h + List.sum(t)
       case _ => 101
     }
     println(x == 3)
 
-    println(tail(List(1,2,3,4,5))
+    println(List.tail(List(1,2,3,4,5))
       == List(2,3,4,5))
-    println(setHead(List(1,2,3,4,5), 8)
+    println(List.setHead(List(1,2,3,4,5), 8)
       == List(8,2,3,4,5))
-    println(drop(List(1,2,3,4,5), 3)
+    println(List.drop(List(1,2,3,4,5), 3)
       == List(4,5))
-    println(dropWhile(List(1,2,3,4,5), (a: Int) => a < 3)
+    println(List.dropWhile(List(1,2,3,4,5), (a: Int) => a < 3)
       == List(3,4,5))
-    println(init(List(1,2,3,4))
+    println(List.init(List(1,2,3,4))
       == List(1,2,3))
 
-    println(sum2(List(1,2,3,4))
+    println(List.sum2(List(1,2,3,4))
       == 10)
-    println(product2(List(1.0, 2.0, 3.0, 4.0))
+    println(List.product2(List(1.0, 2.0, 3.0, 4.0))
       == 24.0)
     // 3.8
-    println(foldRight(List(1, 2, 3), Nil: List[Int])((a, b)=>Cons(a * 2,b))
+    println(List.foldRight(List(1, 2, 3), Nil: List[Int])((a, b)=>Cons(a * 2,b))
       == List(2,4,6))
     // 3.9
-    println(length(List(2,2,2))
+    println(List.length(List(2,2,2))
       == 3)
     // 3.10, 3.11
-    println(foldLeft(List(1, 2, 3), 0: Int)(_+_)
+    println(List.foldLeft(List(1, 2, 3), 0: Int)(_+_)
       == 6)
-    println(foldLeft(List(1.0, 2.0, 3.0, 4.0), 1.0: Double)(_*_)
+    println(List.foldLeft(List(1.0, 2.0, 3.0, 4.0), 1.0: Double)(_*_)
       == 24.0)
     // 3.12
-    println(reverse(List(1,2,3,4))
+    println(List.reverse(List(1,2,3,4))
       ==List(4,3,2,1))
     // 3.13 == foldRigthByLeft
     // 3.14
-    println(append(List(1,2,3), List(1,2,3))
+    println(List.append(List(1,2,3), List(1,2,3))
       ==List(1,2,3,1,2,3))
     // 3.15
-    println(concat(List(List(1,2,3), List(1,2,3)))
+    println(List.concat(List(List(1,2,3), List(1,2,3)))
       ==List(1,2,3,1,2,3))
     // 3.16
-    println(foldRightByLeft(List(1,2,3), Nil: List[Int])((x, z)=>Cons(x+1, z))
+    println(List.foldRightByLeft(List(1,2,3), Nil: List[Int])((x, z)=>Cons(x+1, z))
       == List(2,3,4))
     // 3.17
-    println(foldRightByLeft(List(1.0,2.0,3.0), Nil: List[String])((x, z)=>Cons(x.toString, z))
+    println(List.foldRightByLeft(List(1.0,2.0,3.0), Nil: List[String])((x, z)=>Cons(x.toString, z))
       == List("1.0", "2.0", "3.0"))
     // 3.18
-    println(map(List(1,2,3))((a)=>a*a)
+    println(List.map(List(1,2,3))((a)=>a*a)
       == List(1,4,9))
     // 3.19
-    println(filter(List(1,2,3,4,5,6))(_ % 2 == 0)
+    println(List.filter(List(1,2,3,4,5,6))(_ % 2 == 0)
       == List(2,4,6))
     // 3.20
-    println(flatMap(List(1,2,3))(i=> List(i,i))
+    println(List.flatMap(List(1,2,3))(i=> List(i,i))
       == List(1,1,2,2,3,3))
     // 3.21
-    println(filterByFlatMap(List(1,2,3,4,5,6))(_ % 2 == 0)
+    println(List.filterByFlatMap(List(1,2,3,4,5,6))(_ % 2 == 0)
       == List(2,4,6))
     // 3.22
-    println(zipSum(List(1,2,3), List(4,5,6))
+    println(List.zipSum(List(1,2,3), List(4,5,6))
       == List(5,7,9))
     // 3.23
-    println(zipWith(List(1,2,3), List(4,5,6))(_*_)
+    println(List.zipWith(List(1,2,3), List(4,5,6))(_*_)
       == List(4,10,18))
     // 3.24
-    println(hasSubsequence(List(1, 2, 3, 4, 5, 6), List(4, 5)))
+    println(List.hasSubsequence(List(1, 2, 3, 4, 5, 6), List(4, 5)))
   }
 }

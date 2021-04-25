@@ -1,4 +1,4 @@
-package Ch6
+package fpinscala.state
 import Reducer._
 
 case class Reducer[S, +A](run: S => (A, S)) {

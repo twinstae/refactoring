@@ -1,6 +1,6 @@
-package Ch5
+package fpinscala.laziness
 
-import Ch5.Stream.{cons, empty}
+import fpinscala.laziness.Stream.{cons, empty}
 
 import scala.annotation.tailrec
 

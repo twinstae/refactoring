@@ -1,6 +1,6 @@
-package Ch6
+package fpinscala.state
 
-import Ch6.Candy.simulateMachine
+import fpinscala.state.Candy.simulateMachine
 
 import scala.annotation.tailrec
 
