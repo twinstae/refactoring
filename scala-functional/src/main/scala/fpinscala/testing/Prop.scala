@@ -90,9 +90,9 @@ object Prop {
     Stream.unfold(rng)(rng => Some(g.sample.run(rng)))
 
   def buildMsg[A](s: A, e: Exception): String =
-    s"test case: $s\n" +
+    s"test case: $s \n\n" +
     s"generated an exception: ${e.getMessage()}" +
-     "stack trace:\n " + e.getStackTrace.mkString("\n")
+    "stack trace:\n" + e.getStackTrace.slice(0, 20).mkString("\n")
 
   def run(
     p: Prop,
@@ -101,7 +101,7 @@ object Prop {
     rng: RNG = RNG.SimpleRNG(System.currentTimeMillis)
   ): Unit = {
       p.run(maxSize, testCases, rng) match {
-        case Falsified(msg, n) => println(s"! test failed after $n test:\n $msg")
+        case Falsified(msg, n) => println(s"\n\nFalsified! test failed after $n test:\n $msg \n\n")
         case Passed => println(s"Ok! Passed $testCases tests")
       }
   }
