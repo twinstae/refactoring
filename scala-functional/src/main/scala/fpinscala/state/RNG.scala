@@ -1,8 +1,8 @@
 package fpinscala.state
 
 import fpinscala.state.Candy.simulateMachine
-
 import scala.annotation.tailrec
+import fpinscala.state.RNG._
 
 trait RNG {
   def nextInt: (Int, RNG)
@@ -17,6 +17,12 @@ object RNG {
       (n, nextRNG)
     }
   }
+
+  def boolean(rng: RNG): (Boolean, RNG) = {
+    val (raw_n, nextRNG) = rng.nextInt
+    (if (raw_n % 2 == 1) (true, nextRNG) else (false, nextRNG))
+  }
+
   def nonNegativeInt(rng: RNG): (Int, RNG) = {
     val (raw_n, nextRNG) = rng.nextInt
     (if (raw_n < 0) -(raw_n + 1) else  raw_n, nextRNG)
@@ -129,6 +135,9 @@ object RNG {
 
   def rollDie: Rand[Int] = _map(nonNegativeLessThan(6))(_+1)
 
+}
+
+object rng_test {
   def main(args: Array[String]): Unit = {
     val rng = SimpleRNG(42)
     val (n2, rng2) = rng.nextInt
