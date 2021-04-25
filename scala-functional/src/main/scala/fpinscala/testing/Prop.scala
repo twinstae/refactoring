@@ -98,8 +98,8 @@ object Prop {
     rng: RNG = RNG.SimpleRNG(System.currentTimeMillis)
   ): Unit = {
       p.run(maxSize, testCases, rng) match {
-        case Falsified(msg, n) => println(s"\nFalsified! test failed after $n test:\n $msg \n")
-        case Passed => println(s"\nOk! Passed $testCases tests\n")
+        case Falsified(msg, n) => println(s"Falsified! test failed after $n test:\n $msg \n")
+        case Passed => println(s"Ok! Passed $testCases tests\n")
       }
   }
 }
@@ -116,22 +116,37 @@ object Status {
 
 object test_pbt {
   def main(args: Array[String]): Unit = {
-    val smallInt = Gen.choose(-10, 10)
 
-    val maxPropOf1 = forAll(Gen.listOf1(smallInt)) { intList =>
-      val max = intList.max
-      !intList.exists(_ > max)
+    길이가_1_이상인_리스트("에서 최댓값을 찾으면 더 큰 값이 존재하지 않는다."){
+      l =>
+        val max = l.max
+        !l.exists(_ > max)
     }
-    println("길이가 1 이상인 int List에 max를 적용하면 max보다 큰 값은 존재하지 않는다.")
-    Prop.run(maxPropOf1)
 
-    val sortedProp1 = forAll(Gen.listOf1(smallInt)) { intList =>
-      val sortedList = intList.sorted
+    길이가_1_이상인_리스트("를 정렬했을 때 처음과 끝은 각각 최솟값, 최댓값이다."){
+      l =>
+        val sortedList = l.sorted
       
-      sortedList.max == sortedList.last &&
-      sortedList.min == sortedList(0)
+        sortedList.max == sortedList.last &&
+        sortedList.min == sortedList(0)
     }
-    println("길이가 1 이상인 리스트를 정렬했을 때 처음과 끝은 각각 최솟값, 최댓값이다.")
-    Prop.run(sortedProp1)
+ 
+    길이가_1_이상인_리스트("를 정렬했을 때 리스트의 크기는 변하지 않는다."){
+      l =>
+        val initSize = l.size
+        val sortedList = l.sorted
+      
+        sortedList.size == initSize
+    }
+  }
+
+  def 길이가_1_이상인_리스트(msg: String,
+      g: Gen[Int] = Gen.choose(-10, 10)
+    )(expect: List[Int] =>Boolean){
+    val sortedProp = forAll(Gen.listOf1(g)) { 
+      l => expect(l)
+    }
+    println("길이가 1 이상인 리스트" + msg)
+    Prop.run(sortedProp)
   }
 }
