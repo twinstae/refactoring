@@ -98,8 +98,8 @@ object Prop {
     rng: RNG = RNG.SimpleRNG(System.currentTimeMillis)
   ): Unit = {
       p.run(maxSize, testCases, rng) match {
-        case Falsified(msg, n) => println(s"\n\nFalsified! test failed after $n test:\n $msg \n\n")
-        case Passed => println(s"Ok! Passed $testCases tests")
+        case Falsified(msg, n) => println(s"\nFalsified! test failed after $n test:\n $msg \n")
+        case Passed => println(s"\nOk! Passed $testCases tests\n")
       }
   }
 }
@@ -117,12 +117,21 @@ object Status {
 object test_pbt {
   def main(args: Array[String]): Unit = {
     val smallInt = Gen.choose(-10, 10)
-    val maxProp = forAll(Gen.listOf(smallInt)) { intList =>
-      val max = intList.max
 
+    val maxPropOf1 = forAll(Gen.listOf1(smallInt)) { intList =>
+      val max = intList.max
       !intList.exists(_ > max)
     }
+    println("길이가 1 이상인 int List에 max를 적용하면 max보다 큰 값은 존재하지 않는다.")
+    Prop.run(maxPropOf1)
 
-    Prop.run(maxProp)
+    val sortedProp1 = forAll(Gen.listOf1(smallInt)) { intList =>
+      val sortedList = intList.sorted
+      
+      sortedList.max == sortedList.last &&
+      sortedList.min == sortedList(0)
+    }
+    println("길이가 1 이상인 리스트를 정렬했을 때 처음과 끝은 각각 최솟값, 최댓값이다.")
+    Prop.run(sortedProp1)
   }
 }
