@@ -2,6 +2,24 @@
 'use strict';
 
 
-console.log("Hello, World!");
+function getLabel(l) {
+  switch (l) {
+    case /* ReScript */0 :
+        return "ReScript";
+    case /* Python */1 :
+        return "Python";
+    case /* Rust */2 :
+        return "Rust";
+    case /* Lua */3 :
+        return "Lua";
+    
+  }
+}
 
+console.log("Hello, " + getLabel(/* ReScript */0));
+
+var rescript = /* ReScript */0;
+
+exports.getLabel = getLabel;
+exports.rescript = rescript;
 /*  Not a pure module */
