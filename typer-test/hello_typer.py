@@ -19,5 +19,16 @@ def goodbye(name: str, formal: bool = False):
     else:
         typer.echo(f"Bye {name}!")
 
+@app.command()
+def iam(good: bool = True):
+    message_start = "everything is "
+
+    if good:
+        ending = typer.style("good", fg=typer.colors.GREEN, bold=True)
+    else:
+        ending = typer.style("bad", fg=typer.colors.WHITE, bg=typer.colors.RED)
+
+    typer.echo(message_start + ending)
+
 if __name__ == "__main__":
     app()
