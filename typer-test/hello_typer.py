@@ -19,14 +19,17 @@ def goodbye(name: str, formal: bool = False):
     else:
         typer.echo(f"Bye {name}!")
 
+style_success = lambda content: typer.style(content, fg=typer.colors.GREEN, bold=True)
+style_warning = lambda content: typer.style(content, fg=typer.colors.WHITE, bg=typer.colors.RED)
+
 @app.command()
 def iam(good: bool = True):
     message_start = "everything is "
 
     if good:
-        ending = typer.style("good", fg=typer.colors.GREEN, bold=True)
+        ending = style_success("good")
     else:
-        ending = typer.style("bad", fg=typer.colors.WHITE, bg=typer.colors.RED)
+        ending = style_warning("bad")
 
     typer.echo(message_start + ending)
 
