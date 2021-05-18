@@ -87,9 +87,52 @@ function validate(row_v) {
   }
 }
 
+function validate2(row_v) {
+  var match = row_v.range;
+  var is_m = function (v) {
+    return Caml_string.get(row_v.password, v - 1 | 0) === row_v.m;
+  };
+  return is_m(match[0]) !== is_m(match[1]);
+}
+
 var __x = input_arr.map(validate);
 
 console.log(__x.reduce((function (acc, v) {
+            return acc + (
+                    v ? 1 : 0
+                  ) | 0;
+          }), 0));
+
+console.log(validate2({
+          range: [
+            1,
+            3
+          ],
+          m: /* 'a' */97,
+          password: "abcde"
+        }) === true);
+
+console.log(validate2({
+          range: [
+            1,
+            3
+          ],
+          m: /* 'b' */98,
+          password: "cdefg"
+        }) === false);
+
+console.log(validate2({
+          range: [
+            2,
+            9
+          ],
+          m: /* 'c' */99,
+          password: "ccccccccccccc"
+        }) === false);
+
+var __x$1 = input_arr.map(validate2);
+
+console.log(__x$1.reduce((function (acc, v) {
             return acc + (
                     v ? 1 : 0
                   ) | 0;
@@ -103,4 +146,5 @@ exports.input_arr = input_arr;
 exports.count_m = count_m;
 exports.first_row = first_row;
 exports.validate = validate;
+exports.validate2 = validate2;
 /* raw_input_array Not a pure module */

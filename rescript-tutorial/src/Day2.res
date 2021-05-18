@@ -57,7 +57,26 @@ let validate: (row) => bool = (row_v) => {
   from_ <= count_v && count_v <= to_
 }
 
+let validate2: (row) => bool =
+  (row_v) => {
+    let (a, b) = row_v.range
+    let is_m = (v) => (row_v.password -> String.get(v-1) == row_v.m)
+
+    is_m(a) != is_m(b)
+  }
+
 Js.Console.log(
-  Js.Array.map(validate, input_arr)
-    ->Js.Array.reduce((acc, v)=>(acc + (v ? 1 : 0)), 0, _)
+  input_arr
+  -> Js.Array.map(validate, _)
+  -> Js.Array.reduce((acc, v)=>(acc + (v ? 1 : 0)), 0, _)
+)
+
+Js.Console.log(validate2({range: (1,3), m: 'a', password: "abcde"}) == true)
+Js.Console.log(validate2({range: (1,3), m: 'b', password: "cdefg"}) == false)
+Js.Console.log(validate2({range: (2,9), m: 'c', password: "ccccccccccccc"}) == false)
+
+Js.Console.log(
+  input_arr
+  -> Js.Array.map(validate2, _)
+  -> Js.Array.reduce((acc, v)=>(acc + (v ? 1 : 0)), 0, _)
 )
