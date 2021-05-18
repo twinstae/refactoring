@@ -18,7 +18,7 @@ let fromStringExn = s => {
 let raw_to_range: (string) => (int, int) = (raw_range)=> {
   // input  ex "1-12"
   // output ex (1, 12)
-  switch Js.String.split("-", raw_range)->Js.Array.map(n=>fromStringExn(n), _) {
+  switch Js.String.split("-", raw_range)->Js.Array2.map(fromStringExn) {
     | [a, b] => (a, b)
     | _ => raise(Failure("range.fromStringExn"))
   }
@@ -37,15 +37,15 @@ let raw_to_row = (raw: string) => {
 }
 
 
-let input_arr: array<row> = Js.Array.map(raw_to_row, raw_input_array)
+let input_arr: array<row> = raw_input_array -> Js.Array2.map(raw_to_row)
 
 Js.Console.log(input_arr[0])
 
 let count_m: (char, string) => int = (m, password) => {
   Js.String.split("", password)
-    ->Js.Array.map(s => String.get(s, 0), _)
-    ->Js.Array.filter(c => c == m, _)
-    ->Js.Array.length(_)
+    ->Js.Array2.map(s => String.get(s, 0))
+    ->Js.Array2.filter(c => c == m)
+    ->Js.Array.length
 }
 
 let first_row = input_arr[0]
@@ -67,8 +67,8 @@ let validate2: (row) => bool =
 
 Js.Console.log(
   input_arr
-  -> Js.Array.map(validate, _)
-  -> Js.Array.reduce((acc, v)=>(acc + (v ? 1 : 0)), 0, _)
+  -> Js.Array2.map(validate)
+  -> Js.Array2.reduce((acc, v)=>(acc + (v ? 1 : 0)), 0)
 )
 
 Js.Console.log(validate2({range: (1,3), m: 'a', password: "abcde"}) == true)
@@ -77,6 +77,6 @@ Js.Console.log(validate2({range: (2,9), m: 'c', password: "ccccccccccccc"}) == f
 
 Js.Console.log(
   input_arr
-  -> Js.Array.map(validate2, _)
-  -> Js.Array.reduce((acc, v)=>(acc + (v ? 1 : 0)), 0, _)
+  -> Js.Array2.map(validate2)
+  -> Js.Array2.reduce((acc, v)=>(acc + (v ? 1 : 0)), 0)
 )

@@ -23,8 +23,7 @@ function fromStringExn(s) {
 }
 
 function raw_to_range(raw_range) {
-  var __x = raw_range.split("-");
-  var match = __x.map(fromStringExn);
+  var match = raw_range.split("-").map(fromStringExn);
   if (match.length !== 2) {
     throw {
           RE_EXN_ID: "Failure",
@@ -64,11 +63,9 @@ var input_arr = raw_input_array.map(raw_to_row);
 console.log(Caml_array.get(input_arr, 0));
 
 function count_m(m, password) {
-  var __x = password.split("");
-  var __x$1 = __x.map(function (s) {
-        return Caml_string.get(s, 0);
-      });
-  return __x$1.filter(function (c) {
+  return password.split("").map(function (s) {
+                return Caml_string.get(s, 0);
+              }).filter(function (c) {
               return c === m;
             }).length;
 }
@@ -95,9 +92,7 @@ function validate2(row_v) {
   return is_m(match[0]) !== is_m(match[1]);
 }
 
-var __x = input_arr.map(validate);
-
-console.log(__x.reduce((function (acc, v) {
+console.log(input_arr.map(validate).reduce((function (acc, v) {
             return acc + (
                     v ? 1 : 0
                   ) | 0;
@@ -130,9 +125,7 @@ console.log(validate2({
           password: "ccccccccccccc"
         }) === false);
 
-var __x$1 = input_arr.map(validate2);
-
-console.log(__x$1.reduce((function (acc, v) {
+console.log(input_arr.map(validate2).reduce((function (acc, v) {
             return acc + (
                     v ? 1 : 0
                   ) | 0;
