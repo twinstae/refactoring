@@ -199,32 +199,4 @@ let raw_input = `1655
 1941
 2002`
 
-let input_str_arr: array<string> = Js.String.split("\n", raw_input)
 
-let parse_int = (str: string) => {
-  let option_n = Belt.Int.fromString(str)
-
-  switch option_n {
-    | Some(n) => n
-    | None => -1
-  }
-}
-
-let input_arr: array<int> = Js.Array.map(parse_int, input_str_arr)
-
-let input_set: Belt.Set.Int.t = Belt.Set.Int.fromArray(input_arr)
-
-let result = Js.Array.filter(
-  n => input_set->Belt.Set.Int.has(2020 - n),
-  input_arr
-)
-
-switch result {
-  | [a, b] => {
-    Js.Console.log2(a, b)
-    Js.Console.log(a * b)
-  }
-  | notValid => {
-    Js.Console.log2(notValid, "there is more than one answer!")
-  }
-}
