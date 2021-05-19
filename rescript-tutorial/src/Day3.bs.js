@@ -2,6 +2,7 @@
 'use strict';
 
 var Fs = require("fs");
+var Curry = require("bs-platform/lib/js/curry.js");
 var Caml_obj = require("bs-platform/lib/js/caml_obj.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var Caml_array = require("bs-platform/lib/js/caml_array.js");
@@ -32,8 +33,8 @@ function getRoute(down, right, param) {
             });
 }
 
-function bool_array_sum(bool_array) {
-  return bool_array.reduce((function (acc, v) {
+function bool_array_sum(ba) {
+  return ba.reduce((function (acc, v) {
                 return acc + (
                         v ? 1 : 0
                       ) | 0;
@@ -52,9 +53,9 @@ var test_input = "..##.......\n#...#...#..\n.#....#..#.\n..#.#...#.#\n.#...##..#
 
 var test_tree = input_to_tree_map(test_input);
 
-var test_result = count_tree(1, 3, test_tree);
+var t = count_tree(1, 3, test_tree);
 
-console.log(test_result === 7);
+console.log(t === 7);
 
 var test_suite = [
   [
@@ -93,15 +94,19 @@ console.log(Caml_obj.caml_equal(v, [
 
 var real_tree = input_to_tree_map(Fs.readFileSync("input/Day3.txt", "utf8").trim());
 
-var result = count_tree(1, 3, real_tree);
+var r = count_tree(1, 3, real_tree);
 
-console.log(result === 250);
+console.log(r === 250);
 
-var __x = test_suite.map(function (param) {
-      return count_tree(param[0], param[1], real_tree);
-    });
-
-console.log(__x.reduce((function (acc, v) {
+console.log(test_suite.map(function (param) {
+              var r = param[1];
+              var d = param[0];
+              return function (param) {
+                return count_tree(d, r, param);
+              };
+            }).map(function (f) {
+            return Curry._1(f, real_tree);
+          }).reduce((function (acc, v) {
             return Math.imul(acc, v);
           }), 1));
 
@@ -112,8 +117,6 @@ exports.bool_array_sum = bool_array_sum;
 exports.count_tree = count_tree;
 exports.test_input = test_input;
 exports.test_tree = test_tree;
-exports.test_result = test_result;
 exports.test_suite = test_suite;
 exports.real_tree = real_tree;
-exports.result = result;
 /* test_tree Not a pure module */
