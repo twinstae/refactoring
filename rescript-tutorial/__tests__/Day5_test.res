@@ -40,6 +40,5 @@ describe("parse seat", ()=>{
 
   test_equal("sum of [1,2,4] is 7", sum([1,2,4]), 7)
 
-  find_my_seat(seat_id_list)
-    -> Js.log
+  test_equal("my_seat is 657!", find_my_seat(seat_id_list), 657)
 })
