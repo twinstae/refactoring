@@ -1,4 +1,6 @@
-let raw_input_array = Js.String.split("\n", Day2Input.day2_input)
+let raw_input = Node.Fs.readFileAsUtf8Sync("input/Day2.txt")
+
+let raw_input_array = Js.String.split("\n", raw_input)
 
 Js.Console.log(raw_input_array[0])
 

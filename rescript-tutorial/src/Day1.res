@@ -1,4 +1,6 @@
-let input_str_arr: array<string> = Js.String.split("\n", Day1Input.raw_input)
+let raw_input = Node.Fs.readFileAsUtf8Sync("input/Day1.txt")
+
+let input_str_arr: array<string> = Js.String.split("\n", raw_input)
 
 let parse_int = (str: string) => {
   let option_n = Belt.Int.fromString(str)
