@@ -7,26 +7,28 @@ function get_group_list(input) {
   return input.trim().split("\n\n");
 }
 
+function to_char_array(str) {
+  return Array.from(str);
+}
+
 var all_alpha_lower = "abcdefghijklmnopqrstuvwxyz";
 
-var valid_answer_set = Belt_SetString.fromArray(all_alpha_lower.split(""));
+var valid_answer_set = Belt_SetString.fromArray(Array.from(all_alpha_lower));
 
 function count_group_unique(group) {
-  return Belt_SetString.size(Belt_SetString.fromArray(group.split("").filter(function (v) {
+  return Belt_SetString.size(Belt_SetString.fromArray(Array.from(group).filter(function (v) {
                       return Belt_SetString.has(valid_answer_set, v);
                     })));
 }
 
 function count_every_person(group) {
-  return group.split("\n").reduce((function (acc, answer) {
-                var answer_set = Belt_SetString.fromArray(answer.split(""));
-                return acc.filter(function (v) {
-                            return Belt_SetString.has(answer_set, v);
-                          });
-              }), all_alpha_lower.split("")).length;
+  return Belt_SetString.size(group.split("\n").map(function (answer) {
+                    return Belt_SetString.fromArray(Array.from(answer));
+                  }).reduce(Belt_SetString.intersect, valid_answer_set));
 }
 
 exports.get_group_list = get_group_list;
+exports.to_char_array = to_char_array;
 exports.all_alpha_lower = all_alpha_lower;
 exports.valid_answer_set = valid_answer_set;
 exports.count_group_unique = count_group_unique;
