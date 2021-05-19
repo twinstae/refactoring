@@ -1,17 +1,3 @@
-let test_raw = `ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-byr:1937 iyr:2017 cid:147 hgt:183cm
-
-iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-hcl:#cfa07d byr:1929
-
-hcl:#ae17e1 iyr:2013
-eyr:2024
-ecl:brn pid:760753108 byr:1931
-hgt:179cm
-
-hcl:#cfa07d eyr:2025 pid:166559648
-iyr:2011 ecl:brn hgt:59in`
-
 type key = [
   #birth_year | #issue_year | #expiration_year |
   #height | #hair_color | #eye_color |
@@ -83,22 +69,6 @@ let check_re = (v: string, regExp: Js_re.t)
 
 let eye_color_set = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"] -> Belt.Set.String.fromArray
 
-Js.log2("regex test expect true = ", "#123abc" -> check_re(%re("/^#[0-9a-f]{6}$/")))
-Js.log2("regex test expect false = ", "#123abz" -> check_re(%re("/^#[0-9a-f]{6}$/")))
-
-Js.log2("color_test expect false = ", eye_color_set -> Belt.Set.String.has("wat"))
-Js.log2("color test expect true = ", eye_color_set -> Belt.Set.String.has("brn"))
-
-Js.log2("in range test expect true = ", "2020" -> in_range(2010, 2020))
-Js.log2("in range test expect false = ", "2021" -> in_range(2010, 2020))
-
-Js.log2("check height expect true = ", "193cm" -> check_height)
-Js.log2("check height expect false = ", "194cm" -> check_height)
-Js.log2("check height expect false = ", "190in" -> check_height)
-Js.log2("check height expect true = ", "60in" -> check_height)
-Js.log2("check height expect false = ", "190" -> check_height)
-
-
 let validate_fields = (item_arr: array<item>): bool => {
   item_arr
     -> Js.Array2.every((item)
@@ -115,18 +85,10 @@ let validate_fields = (item_arr: array<item>): bool => {
     )
 }
 
-test_raw
-  -> Js.String2.split("\n\n")
-  -> Js.Array2.map(get_item_arr)
-  -> Js.Array2.filter(check_has_required_fields)
-  -> Js.Array2.length
-  -> Js.log
-
-Node.Fs.readFileAsUtf8Sync("input/Day4.txt")
+let result = Node.Fs.readFileAsUtf8Sync("input/Day4.txt")
   -> Js.String2.trim
   -> Js.String2.split("\n\n")
   -> Js.Array2.map(get_item_arr)
   -> Js.Array2.filter(check_has_required_fields)
   -> Js.Array2.filter(validate_fields)
   -> Js.Array2.length
-  -> Js.log

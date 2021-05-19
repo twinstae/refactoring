@@ -5,8 +5,6 @@ var Fs = require("fs");
 var Belt_Int = require("bs-platform/lib/js/belt_Int.js");
 var Belt_SetString = require("bs-platform/lib/js/belt_SetString.js");
 
-var test_raw = "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd\nbyr:1937 iyr:2017 cid:147 hgt:183cm\n\niyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884\nhcl:#cfa07d byr:1929\n\nhcl:#ae17e1 iyr:2013\neyr:2024\necl:brn pid:760753108 byr:1931\nhgt:179cm\n\nhcl:#cfa07d eyr:2025 pid:166559648\niyr:2011 ecl:brn hgt:59in";
-
 function str_to_key(str) {
   switch (str) {
     case "byr" :
@@ -120,28 +118,6 @@ var eye_color_set = Belt_SetString.fromArray([
       "oth"
     ]);
 
-console.log("regex test expect true = ", check_re("#123abc", /^#[0-9a-f]{6}$/));
-
-console.log("regex test expect false = ", check_re("#123abz", /^#[0-9a-f]{6}$/));
-
-console.log("color_test expect false = ", Belt_SetString.has(eye_color_set, "wat"));
-
-console.log("color test expect true = ", Belt_SetString.has(eye_color_set, "brn"));
-
-console.log("in range test expect true = ", in_range("2020", 2010, 2020));
-
-console.log("in range test expect false = ", in_range("2021", 2010, 2020));
-
-console.log("check height expect true = ", check_height("193cm"));
-
-console.log("check height expect false = ", check_height("194cm"));
-
-console.log("check height expect false = ", check_height("190in"));
-
-console.log("check height expect true = ", check_height("60in"));
-
-console.log("check height expect false = ", check_height("190"));
-
 function validate_fields(item_arr) {
   return item_arr.every(function (item) {
               var match = item[0];
@@ -165,11 +141,8 @@ function validate_fields(item_arr) {
             });
 }
 
-console.log(test_raw.split("\n\n").map(get_item_arr).filter(check_has_required_fields).length);
+var result = Fs.readFileSync("input/Day4.txt", "utf8").trim().split("\n\n").map(get_item_arr).filter(check_has_required_fields).filter(validate_fields).length;
 
-console.log(Fs.readFileSync("input/Day4.txt", "utf8").trim().split("\n\n").map(get_item_arr).filter(check_has_required_fields).filter(validate_fields).length);
-
-exports.test_raw = test_raw;
 exports.str_to_key = str_to_key;
 exports.get_item_arr = get_item_arr;
 exports.log_and_next = log_and_next;
@@ -179,4 +152,5 @@ exports.check_height = check_height;
 exports.check_re = check_re;
 exports.eye_color_set = eye_color_set;
 exports.validate_fields = validate_fields;
+exports.result = result;
 /* eye_color_set Not a pure module */
