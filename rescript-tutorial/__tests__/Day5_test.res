@@ -1,15 +1,10 @@
 open Jest
-open Expect
 open Day5
+open TestUtil
 
 let raw_seat = "FBFBBFFRLR"
 let raw_row =  "FBFBBFF"
 let raw_col =  "RLR"
-
-type test_equal<'a> = (string, 'a, 'a) => assertion
-
-let test_equal =(name: string, actual: 'a, expected: 'a) =>
-  test(name, ()=>expect(actual)|>toEqual(expected))
 
 describe("parse seat", ()=>{
   test_equal("parse_row return expected row",
