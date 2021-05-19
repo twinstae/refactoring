@@ -41,11 +41,12 @@ let max = (l: array<int>) =>
 let min = (l: array<int>) =>
   l -> Js.Array2.reduce((min, v) => v < min ? v : min, 2048)
 
-let sum_of_arithmetic_seq = (l: array<int>): int
-  => (min(l) + max(l)) * (l -> Js.Array2.length) / 2
+let sum_of_arithmetic_seq = (from, end, d): int
+  => (from + end) * (end - from + 1) / d / 2
 
 let sum = (l: array<int>): int
   => l -> Js.Array2.reduce((acc, v) => acc + v, 0)
 
 let find_my_seat = (l: array<int>): int
-  => sum_of_arithmetic_seq(l) - sum(l)
+  => sum_of_arithmetic_seq(min(l), max(l), 1) - sum(l)
+

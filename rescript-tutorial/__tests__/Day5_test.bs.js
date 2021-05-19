@@ -31,12 +31,14 @@ Jest.describe("parse seat", (function (param) {
             });
         test_equal("max of seat_id_list is 920", Day5.max(seat_id_list), 926);
         test_equal("max of seat_id_list is 920", Day5.min(seat_id_list), 80);
-        return test_equal("sum of [1,2,3,4] is 10", Day5.sum([
-                        1,
-                        2,
-                        3,
-                        4
-                      ]), 10);
+        test_equal("sum_of_arithmetic_seq 1 to 4 is 10", Day5.sum_of_arithmetic_seq(1, 4, 1), 10);
+        test_equal("sum of [1,2,4] is 7", Day5.sum([
+                  1,
+                  2,
+                  4
+                ]), 7);
+        console.log(Day5.find_my_seat(seat_id_list));
+        
       }));
 
 exports.raw_seat = raw_seat;
