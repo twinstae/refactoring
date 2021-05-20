@@ -1,5 +1,4 @@
-
-pen Jest
+open Jest
 open TestUtil
 open Day8
 
@@ -51,7 +50,7 @@ describe("Day8 Handheld Halting part1", ()=>{
     test_equal(`stop_until_loop 하면 마지막 acc 값 1675를 반환한다.`,
       real_instructions-> stop_until_loop, 1675)
     
-    test_equal(`correct_and_run 하면 마지막 acc 값 1532를 반환한다`,
+    test_equal(`correct_and_run 하면 마지막 acc 값 ... 을 반환한다`,
       real_instructions-> correct_and_run, 1532)
   })
 })
