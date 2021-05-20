@@ -2,12 +2,51 @@
 'use strict';
 
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
+var Belt_Int = require("bs-platform/lib/js/belt_Int.js");
 var Belt_SetString = require("bs-platform/lib/js/belt_SetString.js");
 
-function parse_inner(right) {
-  return right.replace(".", "").split(", ").map(function (v) {
-              return v.replace(/[0-9]+ /, "").trim();
-            });
+function $$parseInt(v) {
+  var n = Belt_Int.fromString(v);
+  if (n !== undefined) {
+    return n;
+  }
+  throw {
+        RE_EXN_ID: "Failure",
+        _1: v + "is not int",
+        Error: new Error()
+      };
+}
+
+function parse_inner(v) {
+  var match = v.match(/^([0-9]+) ([a-z]+ [a-z]+)/);
+  if (match !== null) {
+    if (match.length !== 3) {
+      throw {
+            RE_EXN_ID: "Failure",
+            _1: "invalid inner input " + v,
+            Error: new Error()
+          };
+    }
+    var count = match[1];
+    var bag = match[2];
+    return [
+            bag,
+            $$parseInt(count)
+          ];
+  }
+  throw {
+        RE_EXN_ID: "Failure",
+        _1: "invalid inner input " + v,
+        Error: new Error()
+      };
+}
+
+function parse_right(right) {
+  if (right.includes("no other")) {
+    return [];
+  } else {
+    return right.replace(".", "").split(", ").map(parse_inner);
+  }
 }
 
 function parseRule(input) {
@@ -23,7 +62,7 @@ function parseRule(input) {
   var right = v[1];
   return {
           outer: left.trim(),
-          inner: parse_inner(right)
+          inner: parse_right(right)
         };
 }
 
@@ -33,12 +72,20 @@ function parseRules(input) {
 
 function to_dict(l) {
   return l.reduce((function (acc, r) {
-                r.inner.forEach(function (inner_bag) {
+                r.inner.forEach(function (param) {
+                      var inner_bag = param[0];
                       var opt_outer = Js_dict.get(acc, inner_bag);
                       var old = opt_outer !== undefined ? opt_outer : [];
                       acc[inner_bag] = old.concat([r.outer]);
                       
                     });
+                return acc;
+              }), {});
+}
+
+function to_reverse_dict(l) {
+  return l.reduce((function (acc, rule) {
+                acc[rule.outer] = rule.inner;
                 return acc;
               }), {});
 }
@@ -59,9 +106,24 @@ function how_many(d, now_bag, childs) {
   }
 }
 
+function count_all_inner(d, now_bag) {
+  var childs = Js_dict.get(d, now_bag);
+  if (childs !== undefined) {
+    return childs.reduce((function (acc, param) {
+                  return acc + Math.imul(count_all_inner(d, param[0]), param[1]) | 0;
+                }), 1);
+  } else {
+    return 1;
+  }
+}
+
+exports.$$parseInt = $$parseInt;
 exports.parse_inner = parse_inner;
+exports.parse_right = parse_right;
 exports.parseRule = parseRule;
 exports.parseRules = parseRules;
 exports.to_dict = to_dict;
+exports.to_reverse_dict = to_reverse_dict;
 exports.how_many = how_many;
+exports.count_all_inner = count_all_inner;
 /* No side effect */
