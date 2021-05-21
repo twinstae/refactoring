@@ -2,12 +2,12 @@
 'use strict';
 
 var Fs = require("fs");
-var Day6 = require("../src/Day6.bs.js");
+var Day6 = require("../../src/week1/Day6.bs.js");
 var Jest = require("@glennsl/bs-jest/src/jest.bs.js");
 var Belt_Id = require("bs-platform/lib/js/belt_Id.js");
 var Belt_Set = require("bs-platform/lib/js/belt_Set.js");
 var Caml_obj = require("bs-platform/lib/js/caml_obj.js");
-var TestUtil = require("./TestUtil.bs.js");
+var TestUtil = require("../TestUtil.bs.js");
 
 var cmp = Caml_obj.caml_compare;
 

@@ -2,9 +2,9 @@
 'use strict';
 
 var Fs = require("fs");
-var Day5 = require("../src/Day5.bs.js");
+var Day5 = require("../../src/week1/Day5.bs.js");
 var Jest = require("@glennsl/bs-jest/src/jest.bs.js");
-var TestUtil = require("./TestUtil.bs.js");
+var TestUtil = require("../TestUtil.bs.js");
 
 var raw_seat = "FBFBBFFRLR";
 

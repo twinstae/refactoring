@@ -2,6 +2,8 @@
 'use strict';
 
 var Jest = require("@glennsl/bs-jest/src/jest.bs.js");
+var Curry = require("bs-platform/lib/js/curry.js");
+var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 
 function test_equal(name, actual, expected) {
   return Jest.test(name, (function (param) {
@@ -11,5 +13,16 @@ function test_equal(name, actual, expected) {
 
 test_equal("test_equal test 128 + 128 = 256", 256, 256);
 
+function test_each_line(input_string, expected_list) {
+  var pair_list = Belt_Array.zip(input_string.trim().split("\n"), expected_list);
+  return function (test_func) {
+    pair_list.forEach(function (param) {
+          return Curry._2(test_func, param[0], param[1]);
+        });
+    
+  };
+}
+
 exports.test_equal = test_equal;
+exports.test_each_line = test_each_line;
 /*  Not a pure module */

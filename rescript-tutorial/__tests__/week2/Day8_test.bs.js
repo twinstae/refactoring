@@ -2,13 +2,14 @@
 'use strict';
 
 var Fs = require("fs");
-var Day8 = require("../src/Day8.bs.js");
+var Day8 = require("../../src/week2/Day8.bs.js");
 var Jest = require("@glennsl/bs-jest/src/jest.bs.js");
-var TestUtil = require("./TestUtil.bs.js");
+var TestUtil = require("../TestUtil.bs.js");
+var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 
 var test_input = "nop +0\nacc +1\njmp +4\nacc +3\njmp -3\nacc -99\nacc +1\njmp -4\nacc +6";
 
-var expected_instruction = [
+var expected_instructions = [
   [
     "no_operation",
     0
@@ -47,24 +48,30 @@ var expected_instruction = [
   ]
 ];
 
+function toString(item) {
+  return Belt_Option.getExn(JSON.stringify(item));
+}
+
 Jest.describe("Day8 Handheld Halting part1", (function (param) {
-        Jest.describe("test input으로", (function (param) {
-                TestUtil.test_equal("acc +1 을 parse_instruction 하면 (#accumulate, 1) 을 반환한다.", Day8.parse_instruction("acc +1"), [
-                      "accumulate",
-                      1
-                    ]);
-                var test_instructions = Day8.parse_instructions(test_input);
-                TestUtil.test_equal("parse_instructions 하면, 올바른 array<instruction>을 반환한다.", test_instructions, expected_instruction);
-                TestUtil.test_equal("stop_until_loop 하면, 마지막 acc 값 5를 반환한다", Day8.stop_until_loop(undefined, undefined, undefined, test_instructions), 5);
-                return TestUtil.test_equal("correct_and_run 하면, 마지막 acc 값 8을 반환한다", Day8.correct_and_run(test_instructions), 8);
+        Jest.describe("parse_instruction", (function (param) {
+                TestUtil.test_each_line(test_input, expected_instructions)(function (line, expected) {
+                      return TestUtil.test_equal("\"" + line + "\"이 들어오면 " + Belt_Option.getExn(JSON.stringify(expected)) + " 을 반환한다.", Day8.parse_instruction(line), expected);
+                    });
+                return TestUtil.test_equal("parse_instructions를 test_input에 적용하면, 올바른 array<instruction>을 반환한다.", Day8.parse_instructions(test_input), expected_instructions);
               }));
-        return Jest.describe("real_input 으로", (function (param) {
-                      var real_instructions = Day8.parse_instructions(Fs.readFileSync("input/Day8.txt", "utf8").trim());
-                      TestUtil.test_equal("stop_until_loop 하면 마지막 acc 값 1675를 반환한다.", Day8.stop_until_loop(undefined, undefined, undefined, real_instructions), 1675);
-                      return TestUtil.test_equal("correct_and_run 하면 마지막 acc 값 ... 을 반환한다", Day8.correct_and_run(real_instructions), 1532);
+        var test_instructions = Day8.parse_instructions(test_input);
+        var real_instructions = Day8.parse_instructions(Fs.readFileSync("input/Day8.txt", "utf8").trim());
+        Jest.describe("stop_until_loop를", (function (param) {
+                TestUtil.test_equal("test_instructions에 적용하면, 마지막 acc 값 5를 반환한다", Day8.stop_until_loop(undefined, undefined, undefined, test_instructions), 5);
+                return TestUtil.test_equal("real_instructions에 적용하면 마지막 acc 값 1675를 반환한다.", Day8.stop_until_loop(undefined, undefined, undefined, real_instructions), 1675);
+              }));
+        return Jest.describe("correct_and_run을", (function (param) {
+                      TestUtil.test_equal("test_instructions에 적용하면, 마지막 acc 값 8을 반환한다", Day8.correct_and_run(test_instructions), 8);
+                      return TestUtil.test_equal("real_instructions에 적용하면 마지막 acc 값 1532를 반환한다", Day8.correct_and_run(real_instructions), 1532);
                     }));
       }));
 
 exports.test_input = test_input;
-exports.expected_instruction = expected_instruction;
+exports.expected_instructions = expected_instructions;
+exports.toString = toString;
 /*  Not a pure module */
