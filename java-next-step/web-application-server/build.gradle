@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'webserver.WebServer'
+
+repositories { 
+    mavenCentral() 
+}
+
+jar {
+    archiveBaseName = 'web-application-server'
+    archiveVersion =  '0.1.0'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    implementation "com.google.guava:guava:18.0"
+    implementation "ch.qos.logback:logback-classic:1.1.2"
+    testImplementation "junit:junit:4.12"
+}
