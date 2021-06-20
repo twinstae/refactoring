@@ -7,5 +7,9 @@
 !gradle/wrapper/gradle-wrapper.jar
 /build
 /.idea
+/.bloop
+/.env
+/.metals
+/.syntastic_javac_config
 *.iml
 .DS_Store
