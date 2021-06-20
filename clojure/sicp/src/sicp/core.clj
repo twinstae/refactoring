@@ -1,4 +1,5 @@
 (ns sicp.core
+  set syntax=clojure
   (:gen-class))
 
 (defn -main
@@ -25,6 +26,14 @@
 (defn square
   [x]
   (* x x))
+
+(defn square-sum [x y] (+ (square x) (square y)))
+
+(defn largest-two-square-sum
+  [x y z]
+  (cond (and (>= x z) (>= y z)) (square-sum x y)
+        (and (>= x y) (>= z y)) (square-sum x z)
+        :else (square-sum y z)))
 
 (defn good-enough?
   [guess x]
