@@ -1,11 +1,13 @@
 package webserver;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.net.Socket;
 
 import org.slf4j.Logger;
@@ -36,22 +38,35 @@ public class RequestHandler extends Thread {
 
             log.debug("request line : {}", line);
             String[] tokens = line.split(" ");
+            String httpMethod = tokens[0];
+            String url = tokens[1];
 
-            int contentLength = 0;
-            boolean logined = false;
+            String body = "Hello World";
+
+            if(httpMethod.equals("GET")){
+              body = handleGet(url);
+            }
+
             while (!line.equals("")) {
                 line = br.readLine();
                 log.debug("header : {}", line);
             }
 
+            byte[] bodyBytes = body.getBytes();
             DataOutputStream dos = new DataOutputStream(out);
 
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            response200Header(dos, bodyBytes.length);
+            responseBody(dos, bodyBytes);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private String handleGet(String url) throws IOException {
+      if(url.equals("/index.html")){
+        return Files.readString(new File("./webapp" + url).toPath());
+      }
+      return "TODO 404";
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
