@@ -1,5 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'application'
+plugins {
+    id "org.gradle.java"
+    id "org.gradle.application"
+    id "com.scuilion.syntastic" version "0.3.9"
+}
 
 mainClassName = 'webserver.WebServer'
 
