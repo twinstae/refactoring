@@ -1,5 +1,4 @@
 (ns sicp.core
-  set syntax=clojure
   (:gen-class))
 
 (defn -main
@@ -83,3 +82,67 @@
     (= x 0) (* 2 y)
     (= y 1) 2
     :else (A (- x 1) (A x (- y 1)))))
+
+;;; test
+
+(defn cube
+  [x]
+  (* x x x))
+
+(defn cube-root
+  [x]
+  (defn improve
+    [guess]
+    (average guess (/ (+ (/ x (square guess))(* 2 guess)) 3)))
+  (defn good-enough?
+    [guess]
+    (< (abs (- (cube guess) x)) 0.000001))
+  (defn cube-iter
+    [guess]
+    (if (good-enough? guess)
+      guess
+      (cube-iter (improve guess))))
+  (cube-iter 1.0))
+
+(cube-root 27)
+(cube-root 8)
+(cube-root 2)
+
+(defn first-denomination
+  [kinds-of-coins]
+  (cond
+    (= kinds-of-coins 1) 1 
+    (= kinds-of-coins 2) 5
+    (= kinds-of-coins 3) 10
+    (= kinds-of-coins 4) 25
+    (= kinds-of-coins 5) 50))
+
+(defn cc
+  [amount kinds-of-coins]
+  (cond
+    (= amount 0) 1
+    (or (< amount 0) (= kinds-of-coins 0)) 0
+    :else (+ (cc amount
+                 (- kinds-of-coins 1))
+             (cc (- amount (first-denomination kinds-of-coins))
+                 kinds-of-coins))))
+
+(defn count-change
+  [amount]
+  (cc amount 5))
+
+(defn f-iter
+  [[a b c] now-n target-n]
+  (cond
+    (= now-n target-n) c
+    :else
+      (f-iter
+        [ b c (+ c (* 2 b) (* 3 a)) ]
+        (+ now-n 1)
+        target-n)))
+
+(defn f
+  [n]
+  (cond
+    (< n 3) n
+    :else (f-iter [1 2 4] 3 n)))
