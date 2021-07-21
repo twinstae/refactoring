@@ -1,0 +1,21 @@
+{
+  "name": "object",
+  "version": "1.0.0",
+  "description": "조영호님의 Object를 JS와 함수형 관점을 더해서 실습",
+  "scripts": {
+    "test": "jest --watch"
+  },
+  "author": "Taehee Kim",
+  "license": "ISC",
+  "dependencies": {
+    "jest": "^27.0.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.8",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/jest": "^26.0.24",
+    "babel-jest": "^27.0.6",
+    "typescript": "^4.3.5"
+  }
+}
