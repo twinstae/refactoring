@@ -9,18 +9,22 @@ export default class TicketOffice {
     this._tickets = tickets;
   }
 
-  // effect
-  getTicket(): Ticket{
-    return this._tickets.pop();
+  getLastTicket(): Ticket{
+    return this._tickets[this._tickets.length - 1];
+  }
+
+  process_selling(received_money: number): void {
+    this._plusAmount(received_money);
+    this._popTicket();
   }
 
   // effect
-  minusAmount(value: number): void {
-    this._amount -= value;
+  _popTicket(): void{
+    this._tickets.pop();
   }
 
   // effect
-  plusAmount(value: number): void {
+  _plusAmount(value: number): void {
     this._amount += value;
   }
 }

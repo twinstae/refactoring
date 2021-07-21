@@ -10,15 +10,16 @@ export default class Theater {
   }
 
   enter(audience: Audience): boolean {
-    const ticket = this._ticketSeller.getTicket(); // calc
+    const ticket = this._ticketSeller.getLastTicket(); // calc
 
-    const result = audience.buy(ticket); // calc or effect
+    const result = audience.buy(ticket); // effect
     if (result == "can not buy"){
       return false;
     }
     
     const received_money = result == "paid" ? ticket.getFee() : 0;
-    this._ticketSeller.process_selling(received_money);
+    this._ticketSeller.process_selling(received_money); // calc
+
     return true;
   }
 }
