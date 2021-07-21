@@ -8,15 +8,20 @@ export default class TicketSeller {
     this._ticketOffice = ticketOffice;
   }
 
-  getTicketFee(): number {
-    return this._ticketOffice._tickets[this._ticketOffice._tickets.length - 1].getFee()
+  getTicket(): Ticket {
+    return this._ticketOffice._tickets[this._ticketOffice._tickets.length - 1];
   }
 
-  popTicket(): Ticket{
-    return this._ticketOffice.getTicket()
+  process_selling(received_money: number){
+    this._receiveMoney(received_money);
+    this._popTicket();
   }
 
-  receiveMoney(money: number){
+  _popTicket(): void{
+    this._ticketOffice.getTicket()
+  }
+
+  _receiveMoney(money: number){
     this._ticketOffice.plusAmount(money);
   }
 }

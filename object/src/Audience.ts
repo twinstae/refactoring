@@ -1,7 +1,5 @@
-import Bag from "./Bag";
+import Bag, { buyResult } from "./Bag";
 import Ticket from "./Ticket";
-
-export type canPayResult = "have invitation" | "can pay" | "can not buy";
 
 export default class Audience {
   _bag: Bag
@@ -10,25 +8,11 @@ export default class Audience {
     this._bag = bag;
   }
 
-  hasInvitationOrCanPay(fee: number): canPayResult {
-    if (this._bag.hasInvitation()){ // calc
-      return "have invitation";
-    } else if (this._bag._amount > fee) {
-      return "can pay";
-    } else {
-      return "can not buy";
-    }
-  }
-
-  pay(fee: number): void {
-    this._bag.minusAmount(fee); // effect
+  buy(ticket: Ticket): buyResult{
+    return this._bag.buy(ticket);
   }
 
   hasTicket(): boolean {
     return this._bag._ticket != null;
-  }
-
-  receiveTicket(ticket: Ticket){
-    this._bag.setTicket(ticket);
   }
 }

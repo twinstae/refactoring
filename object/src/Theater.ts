@@ -1,5 +1,6 @@
 import TicketSeller from "./TicketSeller";
-import Audience, { pay_result } from "./Audience";
+import Audience from "./Audience";
+
 
 export default class Theater {
   _ticketSeller: TicketSeller
@@ -9,20 +10,15 @@ export default class Theater {
   }
 
   enter(audience: Audience): boolean {
-    const ticket_fee = this._ticketSeller.getTicketFee(); // calc
+    const ticket = this._ticketSeller.getTicket(); // calc
 
-    const result = audience.hasInvitationOrCanPay(ticket_fee); // calc
+    const result = audience.buy(ticket); // calc or effect
     if (result == "can not buy"){
       return false;
     }
-
-    if (result == "can pay"){
-      audience.pay(ticket_fee);
-      this._ticketSeller.receiveMoney(ticket_fee); // effect
-    }
-
-    const ticket = this._ticketSeller.popTicket(); // effect
-    audience.receiveTicket(ticket); // effect
+    
+    const received_money = result == "paid" ? ticket.getFee() : 0;
+    this._ticketSeller.process_selling(received_money);
     return true;
   }
 }
