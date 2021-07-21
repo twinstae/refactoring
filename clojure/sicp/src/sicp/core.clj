@@ -145,3 +145,13 @@
   (cond (= b 1) a
         (even? b) (double-by-plus (multiply-int a (/ b 2)))
         :else (+ a (multiply-int a (- b 1)))))
+
+
+(defn even-fib-sum [upper]
+  (defn even-fib-sum-iter [a b result]
+    (if (>= b upper)
+      result
+      (even-fib-sum-iter
+        b (+ a b)
+        (if (even? b) (+ result b) result))))
+  (even-fib-sum-iter 1 1 0))

@@ -61,3 +61,7 @@
   (testing "multiply-int"
     (is (= (multiply-int 4 4) (* 4 4)))
     (is (= (multiply-int 16 15) (* 16 15)))))
+
+(deftest Euler-2
+  (testing "even-fib-sum"
+    (is (= (even-fib-sum 4000000) 4613732))))
