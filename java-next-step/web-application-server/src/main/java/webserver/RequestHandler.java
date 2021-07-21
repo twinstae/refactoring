@@ -8,10 +8,15 @@ import java.io.OutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import util.HttpRequestUtils;
+import util.Request;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -31,25 +36,29 @@ public class RequestHandler extends Thread {
             OutputStream out = connection.getOutputStream()
         ) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+
+            List<String> lines = new ArrayList<String>();
+
             String line = br.readLine();
-            if (line == null) {
-                return;
+
+            if(line == null){
+              return;
+            }
+            
+            lines.add(line);
+
+            while(!line.equals("")){
+              line = br.readLine();
+              lines.add(line);
             }
 
-            log.debug("request line : {}", line);
-            String[] tokens = line.split(" ");
-            String httpMethod = tokens[0];
-            String url = tokens[1];
+            Request req = HttpRequestUtils.parseRequest(lines);
+
+            log.debug("{} {}", req.getMethod(), req.getRequestPath());
 
             String body = "Hello World";
-
-            if(httpMethod.equals("GET")){
-              body = handleGet(url);
-            }
-
-            while (!line.equals("")) {
-                line = br.readLine();
-                log.debug("header : {}", line);
+            if(req.getMethod().equals("GET")){
+              body = handleGet(req);
             }
 
             byte[] bodyBytes = body.getBytes();
@@ -62,9 +71,9 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private String handleGet(String url) throws IOException {
-      if(url.equals("/index.html")){
-        return Files.readString(new File("./webapp" + url).toPath());
+    private String handleGet(Request req) throws IOException {
+      if(req.getRequestPath().equals("/index.html")){
+        return Files.readString(new File("./webapp" + req.getRequestPath()).toPath());
       }
       return "TODO 404";
     }
