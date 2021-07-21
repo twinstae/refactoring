@@ -1,5 +1,5 @@
 import TicketSeller from "./TicketSeller";
-import Audience from "./Audience";
+import Audience, { pay_result } from "./Audience";
 
 export default class Theater {
   _ticketSeller: TicketSeller
@@ -9,16 +9,14 @@ export default class Theater {
   }
 
   enter(audience: Audience): void {
-    if (audience._bag.hasInvitation()){ // calc
-      const ticket = this._ticketSeller._ticketOffice.getTicket(); // effect
-      audience._bag.setTicket(ticket); // effect
-    } else {
-      const ticket = this._ticketSeller._ticketOffice.getTicket(); // effect
-      
-      // transaction
-      audience._bag.minusAmount(ticket.getFee()); // effect
-      this._ticketSeller._ticketOffice.plusAmount(ticket.getFee()); // effect
-      audience._bag.setTicket(ticket); // effect
+    const ticket = this._ticketSeller.getTicket(); // effect
+    const ticket_fee = ticket.getFee();
+
+    const result = audience.show_invitation_or_pay(ticket_fee);
+    if (result == "payed"){
+      this._ticketSeller.receiveMoney(ticket_fee); // effect
     }
+
+    audience.receiveTicket(ticket); // effect
   }
 }
