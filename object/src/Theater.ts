@@ -8,15 +8,21 @@ export default class Theater {
     this._ticketSeller = ticketSeller;
   }
 
-  enter(audience: Audience): void {
-    const ticket = this._ticketSeller.getTicket(); // effect
-    const ticket_fee = ticket.getFee();
+  enter(audience: Audience): boolean {
+    const ticket_fee = this._ticketSeller.getTicketFee(); // calc
 
-    const result = audience.show_invitation_or_pay(ticket_fee);
-    if (result == "payed"){
+    const result = audience.hasInvitationOrCanPay(ticket_fee); // calc
+    if (result == "can not buy"){
+      return false;
+    }
+
+    if (result == "can pay"){
+      audience.pay(ticket_fee);
       this._ticketSeller.receiveMoney(ticket_fee); // effect
     }
 
+    const ticket = this._ticketSeller.popTicket(); // effect
     audience.receiveTicket(ticket); // effect
+    return true;
   }
 }

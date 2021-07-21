@@ -4,11 +4,12 @@ import Ticket from "./Ticket";
 export default class Bag {
   _invitation: Invitation
   _amount: number
-  _ticket: Ticket
+  _ticket: Ticket | null
 
   constructor(invitation: Invitation, amount: number){
     this._invitation = invitation;
     this._amount = amount;
+    this._ticket = null;
   }
 
   ofAmount(amount: number){

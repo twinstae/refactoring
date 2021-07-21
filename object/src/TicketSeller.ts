@@ -8,7 +8,11 @@ export default class TicketSeller {
     this._ticketOffice = ticketOffice;
   }
 
-  getTicket(): Ticket{
+  getTicketFee(): number {
+    return this._ticketOffice._tickets[this._ticketOffice._tickets.length - 1].getFee()
+  }
+
+  popTicket(): Ticket{
     return this._ticketOffice.getTicket()
   }
 
