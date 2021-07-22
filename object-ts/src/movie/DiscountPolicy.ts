@@ -9,12 +9,11 @@ export default abstract class DiscountPolicy {
   }
 
   calculateDiscountAmount(screeningDto: ScreeningDto): Money{
-    for (const each of this._conditions){
-      if (each.isSatisfiedBy(screeningDto)){
-        return this._getDiscountAmount(screeningDto)
-      }
+    const is_discountable = this._conditions.some(cond => cond.isSatisfiedBy(screeningDto));
+    
+    if (is_discountable){
+      return this._getDiscountAmount(screeningDto)
     }
-
     return Money.ZERO;
   }
 

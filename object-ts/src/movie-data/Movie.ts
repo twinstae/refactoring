@@ -1,6 +1,6 @@
 import Money from "../movie/Money";
-import DiscountCondtion, {get_is_discountable} from "./DiscountCondition";
-import Screening from "./Screening";
+import DiscountCondtion from "./DiscountCondition";
+import { satisfiedCondition } from "./DiscountCondition";
 
 export enum MovieType {
   AMOUNT_DISCOUNT,
@@ -28,14 +28,19 @@ export default class Movie {
   }
 }
 
+interface ScreeningDto {
+  startTime: Date,
+  sequence: number
+}
 
-export function calculateDiscountAmount(screening: Screening){
-  if (! get_is_discountable(screening)){
-    return Money.ZERO;
-  }
+export function get_is_discountable(
+  screeningDto: ScreeningDto,
+  movie: Movie
+){
+  return movie.discountCondtions.some((cond)=> satisfiedCondition(screeningDto, cond));
+}
 
-  const movie = screening.movie;
-
+export function calculateDiscountAmount(movie: Movie){
   if (movie.movieType == MovieType.AMOUNT_DISCOUNT){
     return movie.discountAmount;
   } else if (movie.movieType == MovieType.PERCENT_DISCOUNT){
@@ -43,4 +48,12 @@ export function calculateDiscountAmount(screening: Screening){
   } else {
     return Money.ZERO;
   }
+}
+
+export function calculateMovieFee(movie: Movie, screeningDto: ScreeningDto){
+  if (! get_is_discountable(screeningDto, movie)){
+    return movie.fee;
+  }
+  const discountAmount = calculateDiscountAmount(movie);
+  return movie.fee.minus(discountAmount);
 }

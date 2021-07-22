@@ -1,5 +1,3 @@
-import Screening from "./Screening";
-
 type DayOfWeek = "월" | "화" | "수" | "목" | "금" | "토" | "일";
 
 export function n_to_day_of_week(n: number){
@@ -37,17 +35,12 @@ export default class DiscountCondtion {
 }
 
 
-export function get_is_discountable(screening: Screening){
-  const movie = screening.movie;
-  return movie.discountCondtions.some((condition: DiscountCondtion)=>{
-    if (condition.conditionType == DiscountCondtionType.PERIOD){
-      const startTime = screening.whenScreened;
-
-      return n_to_day_of_week(startTime.getDay()) == condition.dayOfWeek
-        && condition.startTime <= startTime
-        && condition.endTime >= startTime;
-    } else {
-      return condition.sequence == screening.sequence;
-    }
-  });
-}
+export const satisfiedCondition = ({ startTime, sequence}, condition: DiscountCondtion)=>{
+  if (condition.conditionType == DiscountCondtionType.PERIOD){
+    return n_to_day_of_week(startTime.getDay()) == condition.dayOfWeek
+      && condition.startTime <= startTime
+      && condition.endTime >= startTime;
+  } else {
+    return condition.sequence == sequence;
+  }
+};

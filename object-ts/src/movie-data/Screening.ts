@@ -1,4 +1,4 @@
-import Movie, {calculateDiscountAmount} from "./Movie";
+import Movie, { calculateMovieFee } from "./Movie";
 
 export default class Screening {
   movie: Movie
@@ -17,6 +17,6 @@ export default class Screening {
 }
 
 export function calculateFee(screening: Screening){
-  const discountAmount = calculateDiscountAmount(screening);
-  return screening.movie.fee.minus(discountAmount);
+  const screeningDto = { startTime: screening.whenScreened, sequence: screening.sequence };
+  return calculateMovieFee(screening.movie, screeningDto);
 }
