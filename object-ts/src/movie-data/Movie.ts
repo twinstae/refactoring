@@ -1,31 +1,11 @@
 import Money from "../movie/Money";
-import DiscountCondtion from "./DiscountCondition";
-import { satisfiedCondition } from "./DiscountCondition";
+import { DiscountCondtion, satisfiedCondition } from "./DiscountCondition";
 
-export enum MovieType {
-  AMOUNT_DISCOUNT,
-  PERCENT_DISCOUNT,
-  NONE_DISCOUNT,
-}
-
-export default class Movie {
+export type Movie = {
   title: string
   fee: Money
   discountCondtions: DiscountCondtion[]
-
-  movieType: MovieType
-  discountAmount: Money
-  discountPercent: number
-
-  constructor(
-    title: string,
-    fee: Money,
-    discountCondtion: DiscountCondtion[]
-  ){
-    this.title = title;
-    this.fee = fee;
-    this.discountCondtions = discountCondtion;
-  }
+  calculateDiscount: DiscountFunc
 }
 
 interface ScreeningDto {
@@ -40,20 +20,20 @@ export function get_is_discountable(
   return movie.discountCondtions.some((cond)=> satisfiedCondition(screeningDto, cond));
 }
 
-export function calculateDiscountAmount(movie: Movie){
-  if (movie.movieType == MovieType.AMOUNT_DISCOUNT){
-    return movie.discountAmount;
-  } else if (movie.movieType == MovieType.PERCENT_DISCOUNT){
-    return movie.fee.times(movie.discountPercent);
-  } else {
-    return Money.ZERO;
-  }
+
+export type DiscountFunc = (fee: Money) => Money;
+export function createAmountDiscount(amount: Money): DiscountFunc {
+  return (_) => amount
+}
+
+export function createPercentDiscount(percent: number): DiscountFunc {
+  return (fee: Money) => fee.times(percent);
 }
 
 export function calculateMovieFee(movie: Movie, screeningDto: ScreeningDto){
   if (! get_is_discountable(screeningDto, movie)){
     return movie.fee;
   }
-  const discountAmount = calculateDiscountAmount(movie);
+  const discountAmount = movie.calculateDiscount(movie.fee);
   return movie.fee.minus(discountAmount);
 }

@@ -1,12 +1,17 @@
-import Customer from "./Customer";
-import Reservation from "./Reservation";
-import Screening, {calculateFee} from "./Screening";
+import { Customer } from "./Customer";
+import { Reservation }  from "./Reservation";
+import { Screening, calculateFee} from "./Screening";
 
-export default function reserve(screening: Screening, customer: Customer, audienceCount: number){
-  return new Reservation(
+export default function reserve(
+  screening: Screening,
+  customer: Customer,
+  audienceCount: number
+): Reservation {
+  return {
     customer,
     screening,
-    calculateFee(screening),
-    audienceCount);
+    fee: calculateFee(screening),
+    audienceCount,
+  }
 }
 
