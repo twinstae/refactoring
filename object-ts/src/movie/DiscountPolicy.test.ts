@@ -1,8 +1,18 @@
-import { AmountDiscountPolicy, PercentDiscountPolicy } from "./DiscountPolicy"
+import {
+  AmountDiscountPolicy,
+  NoneDiscountPolicy,
+  PercentDiscountPolicy,
+} from "./DiscountPolicy";
+import {
+  NeverDiscountCondition,
+  AlwaysDiscountCondition,
+} from "./DiscountCondition";
 import Money from "./Money";
 
-const AlwaysDiscountCondition = { isSatisfiedBy: (_) => true  };
-const NeverDiscountCondition  = { isSatisfiedBy: (_) => false };
+function expectMoneyEqual(a: Money, b: Money){
+  expect(a._amount).toEqual(b._amount);
+}
+
 describe("DiscountPolicy", ()=>{
   describe("AmountDiscountPolicy", ()=>{
     test("할인액은 일정하다.", ()=>{
@@ -12,7 +22,7 @@ describe("DiscountPolicy", ()=>{
       );
 
       const discountAmount = policy.calculateDiscountAmount(null);
-      expect(discountAmount._amount).toBe(BigInt(5000))
+      expectMoneyEqual(discountAmount, Money.wons(5000));
     })
 
     test("조건에 맞지 않으면, 할인되지 않는다.", ()=>{
@@ -22,7 +32,7 @@ describe("DiscountPolicy", ()=>{
       );
 
       const discountAmount = policy.calculateDiscountAmount(null);
-      expect(discountAmount._amount).toEqual(Money.ZERO._amount);
+      expectMoneyEqual(discountAmount, Money.ZERO);
     })
   })
 
@@ -33,11 +43,18 @@ describe("DiscountPolicy", ()=>{
         [AlwaysDiscountCondition]
       );
 
-      const discountAmount = policy.calculateDiscountAmount({
-        getMovieFee: () => Money.wons(39000)
+      const discountAmount = policy._getDiscountAmount({
+        getMovieFee: () => Money.wons(39000) 
       })
+      
+      expectMoneyEqual(discountAmount, Money.wons(39000 * 0.5));
+    })
+  })
 
-      expect(discountAmount._amount).toBe(BigInt(39000 * 0.5));
+  describe("NoneDiscountPolicy", ()=>{
+    test("할인액은 0원 = ZERO 다.", ()=>{
+      const discountAmount = NoneDiscountPolicy.calculateDiscountAmount(null);
+      expectMoneyEqual(discountAmount, Money.ZERO);
     })
   })
 })
