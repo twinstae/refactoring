@@ -1,6 +1,5 @@
 import Money from "./Money";
-import Screening from "./Screening";
-import DiscountCondition, {NeverDiscountCondition} from "./DiscountCondition";
+import DiscountCondition, {NeverDiscountCondition, ScreeningDto} from "./DiscountCondition";
 
 export default abstract class DiscountPolicy {
   _conditions = [];
@@ -9,17 +8,17 @@ export default abstract class DiscountPolicy {
     this._conditions = conditions;
   }
 
-  calculateDiscountAmount(screening: Screening): Money{
+  calculateDiscountAmount(screeningDto: ScreeningDto): Money{
     for (const each of this._conditions){
-      if (each.isSatisfiedBy(screening)){
-        return this._getDiscountAmount(screening)
+      if (each.isSatisfiedBy(screeningDto)){
+        return this._getDiscountAmount(screeningDto)
       }
     }
 
     return Money.ZERO;
   }
 
-  abstract _getDiscountAmount(screening: Screening): Money;
+  abstract _getDiscountAmount(screening: ScreeningDto): Money;
 }
 
 
@@ -46,7 +45,7 @@ export class PercentDiscountPolicy extends DiscountPolicy {
     this._percent = percent;
   }
 
-  _getDiscountAmount(screening: { getMovieFee: () => Money }): Money {
-    return screening.getMovieFee().times(this._percent);
+  _getDiscountAmount(screeningDto: { fee: Money }): Money {
+    return screeningDto.fee.times(this._percent);
   }
 }

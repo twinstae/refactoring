@@ -1,20 +1,17 @@
-import Screening from "./Screening";
 import Money from "./Money";
+import DiscountPolicy from "./DiscountPolicy";
 
 export default class Movie {
   _title: string
-  _runningTime: Duration;
   _fee: Money;
   _discountPolicy: DiscountPolicy;
 
   constructor(
     title: string,
-    runningTime: Duration,
     fee: Money,
     discountPolicy: DiscountPolicy,
   ){
     this._title = title;
-    this._runningTime = runningTime;
     this._fee = fee;
     this._discountPolicy = discountPolicy;
   }
@@ -23,8 +20,12 @@ export default class Movie {
     return this._fee;
   }
 
-  calculateMovieFee(screening: Screening): Money {
-    const discountAmount = this._discountPolicy.calculateDiscountAmount(screening);
+  calculateMovieFee({ startTime, isSequence }): Money {
+    const discountAmount = this._discountPolicy.calculateDiscountAmount({
+      startTime,
+      isSequence,
+      fee: this._fee,
+    });
     return this._fee.minus(discountAmount);
   }
 }

@@ -8,7 +8,7 @@ import { AlwaysDiscountCondition } from "./DiscountCondition";
 describe("Screening", ()=>{
   describe("아이즈온미 30000원을 5000원 할인해서", ()=>{
     const discountPolicy = new AmountDiscountPolicy(Money.wons(5000), [AlwaysDiscountCondition]);
-    const movie = new Movie("아이즈온미 더 무비", 60, Money.wons(30000), discountPolicy);
+    const movie = new Movie("아이즈온미 더 무비", Money.wons(30000), discountPolicy);
     const whenScreened = new Date(2020, 6 -1, 10, 12);
     const screening = new Screening(movie, 4, whenScreened);
 

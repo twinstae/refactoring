@@ -1,11 +1,17 @@
-import Screening from "./Screening";
+import Money from "./Money";
 
-export default interface DiscountCondition {
-  isSatisfiedBy(screening: Screening): boolean
+export interface ScreeningDto {
+  startTime: Date,
+  isSequence: (sequence: number) => boolean,
+  fee: Money,
 }
 
-export const AlwaysDiscountCondition = { isSatisfiedBy: (_: Screening ) => true  };
-export const NeverDiscountCondition  = { isSatisfiedBy: (_: Screening ) => false };
+export default interface DiscountCondition {
+  isSatisfiedBy(screening: ScreeningDto): boolean
+}
+
+export const AlwaysDiscountCondition = { isSatisfiedBy: (_: ScreeningDto ) => true  };
+export const NeverDiscountCondition  = { isSatisfiedBy: (_: ScreeningDto ) => false };
 
 export class SequenceCondition implements DiscountCondition {
   _sequence: number
@@ -40,8 +46,7 @@ export class PeriodCondition implements DiscountCondition {
     this._endTime = endTime;
   }
 
-  isSatisfiedBy(screening: { getStartTime: () => Date }): boolean {
-    const startTime = screening.getStartTime();
+  isSatisfiedBy({ startTime }): boolean {
     const dayOfWeek = n_to_day_of_week(startTime.getDay());
 
     return dayOfWeek == this._dayOfWeek

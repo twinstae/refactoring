@@ -43,9 +43,7 @@ describe("DiscountPolicy", ()=>{
         [AlwaysDiscountCondition]
       );
 
-      const discountAmount = policy._getDiscountAmount({
-        getMovieFee: () => Money.wons(39000) 
-      })
+      const discountAmount = policy._getDiscountAmount({ fee: Money.wons(39000) })
       
       expectMoneyEqual(discountAmount, Money.wons(39000 * 0.5));
     })

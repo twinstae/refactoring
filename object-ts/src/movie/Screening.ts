@@ -36,6 +36,9 @@ export default class Screening {
   }
 
   _calculateFee(audienceCount: number): Money {
-    return this._movie.calculateMovieFee(this).times(audienceCount);
+    return this._movie.calculateMovieFee({
+      isSequence: this.isSequence,
+      startTime: this.getStartTime(),
+    }).times(audienceCount);
   }
 }
