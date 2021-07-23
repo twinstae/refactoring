@@ -1,3 +1,3 @@
 export type Invitation = {
-  when: Date
-}
+  when: Date;
+};

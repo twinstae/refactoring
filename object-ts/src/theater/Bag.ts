@@ -1,20 +1,20 @@
-import { Invitation } from "./Invitation";
-import Ticket from "./Ticket";
+import { Invitation } from './Invitation';
+import Ticket from './Ticket';
 
-export type buyResult = "have invitation" | "paid" | "can not buy";
+export type buyResult = 'have invitation' | 'paid' | 'can not buy';
 
 export default class Bag {
-  _invitation: Invitation
-  _amount: number
-  _ticket: Ticket | null
+  _invitation: Invitation;
+  _amount: number;
+  _ticket: Ticket | null;
 
-  constructor(invitation: Invitation, amount: number){
+  constructor(invitation: Invitation, amount: number) {
     this._invitation = invitation;
     this._amount = amount;
     this._ticket = null;
   }
 
-  ofAmount(amount: number){
+  ofAmount(amount: number) {
     return new Bag(null, amount);
   }
 
@@ -22,29 +22,30 @@ export default class Bag {
     const ticket_fee = ticket.getFee();
     const canBuy = this._canBuy(ticket_fee);
 
-    if (canBuy == "can not buy"){
-      return "can not buy";
+    if (canBuy == 'can not buy') {
+      return 'can not buy';
     }
 
-    if (canBuy == "paid"){
-      this._minusAmount(ticket_fee) // effect
+    if (canBuy == 'paid') {
+      this._minusAmount(ticket_fee); // effect
     }
     this._setTicket(ticket); // effect
 
-    return canBuy
+    return canBuy;
   }
 
   _hasInvitation(): boolean {
     return this._invitation != null;
   }
 
-  _canBuy(fee: number): buyResult{
-    if (this._hasInvitation()){ // calc
-      return "have invitation";
+  _canBuy(fee: number): buyResult {
+    if (this._hasInvitation()) {
+      // calc
+      return 'have invitation';
     } else if (this._amount > fee) {
-      return "paid";
+      return 'paid';
     } else {
-      return "can not buy";
+      return 'can not buy';
     }
   }
 
@@ -52,7 +53,7 @@ export default class Bag {
     this._amount -= value;
   }
 
-  _setTicket(ticket: Ticket): void{
+  _setTicket(ticket: Ticket): void {
     this._ticket = ticket;
   }
 }

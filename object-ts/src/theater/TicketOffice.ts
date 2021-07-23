@@ -1,15 +1,15 @@
-import Ticket from "./Ticket";
+import Ticket from './Ticket';
 
 export default class TicketOffice {
-  _amount: number
-  _tickets: Ticket[]
+  _amount: number;
+  _tickets: Ticket[];
 
-  constructor(amount: number, tickets: Ticket[]){
+  constructor(amount: number, tickets: Ticket[]) {
     this._amount = amount;
     this._tickets = tickets;
   }
 
-  getLastTicket(): Ticket{
+  getLastTicket(): Ticket {
     return this._tickets[this._tickets.length - 1];
   }
 
@@ -19,7 +19,7 @@ export default class TicketOffice {
   }
 
   // effect
-  _popTicket(): void{
+  _popTicket(): void {
     this._tickets.pop();
   }
 

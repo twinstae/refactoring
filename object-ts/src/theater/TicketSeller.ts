@@ -1,10 +1,10 @@
-import Ticket from "./Ticket";
-import TicketOffice from "./TicketOffice";
+import Ticket from './Ticket';
+import TicketOffice from './TicketOffice';
 
 export default class TicketSeller {
-  _ticketOffice: TicketOffice
+  _ticketOffice: TicketOffice;
 
-  constructor(ticketOffice: TicketOffice){
+  constructor(ticketOffice: TicketOffice) {
     this._ticketOffice = ticketOffice;
   }
 
@@ -12,7 +12,7 @@ export default class TicketSeller {
     return this._ticketOffice.getLastTicket();
   }
 
-  process_selling(received_money: number){
+  process_selling(received_money: number) {
     this._ticketOffice.process_selling(received_money);
   }
 }

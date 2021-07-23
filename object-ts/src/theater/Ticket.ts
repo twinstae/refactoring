@@ -1,7 +1,7 @@
 export default class Ticket {
-  _fee: number
+  _fee: number;
 
-  constructor(fee: number){
+  constructor(fee: number) {
     this._fee = fee;
   }
 

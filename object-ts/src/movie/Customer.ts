@@ -1,7 +1,7 @@
 export default class Customer {
-  name: string
+  name: string;
 
-  constructor(name=""){
+  constructor(name = '') {
     this.name = name;
   }
 }

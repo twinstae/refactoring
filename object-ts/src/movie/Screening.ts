@@ -1,18 +1,14 @@
-import Customer from "./Customer";
-import Reservation from "./Reservation";
-import Movie from "./Movie";
-import Money from "./Money";
+import Customer from './Customer';
+import Reservation from './Reservation';
+import Movie from './Movie';
+import Money from './Money';
 
 export default class Screening {
-  _movie: Movie
-  _sequence: number
-  _whenScreened: Date
+  _movie: Movie;
+  _sequence: number;
+  _whenScreened: Date;
 
-  constructor(
-    movie: Movie,
-    sequence: number,
-    whenScreened: Date,
-  ){
+  constructor(movie: Movie, sequence: number, whenScreened: Date) {
     this._movie = movie;
     this._sequence = sequence;
     this._whenScreened = whenScreened;
@@ -36,9 +32,11 @@ export default class Screening {
   }
 
   _calculateFee(audienceCount: number): Money {
-    return this._movie.calculateMovieFee({
-      isSequence: this.isSequence,
-      startTime: this.getStartTime(),
-    }).times(audienceCount);
+    return this._movie
+      .calculateMovieFee({
+        isSequence: this.isSequence,
+        startTime: this.getStartTime(),
+      })
+      .times(audienceCount);
   }
 }
